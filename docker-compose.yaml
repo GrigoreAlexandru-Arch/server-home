@@ -6,7 +6,7 @@ networks:
 
 services:
   wg:
-    image: ngoduykhanh/wireguard-ui:latest-arm64
+    image: ngoduykhanh/wireguard-ui:latest
     container_name: wgui
     restart: always
     environment:
@@ -34,7 +34,7 @@ services:
       - ./data/dnsmasq.d:/etc/dnsmasq.d
 
   reverse-proxy:
-    image: caddy
+    image: nginx
     container_name: reverse-proxy
     restart: always
     networks:
@@ -42,33 +42,7 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./data/caddy/Caddyfile:/etc/caddy/Caddyfile
-      - ./data/caddy/site:/srv
-      - ./data/caddy:/data
-      - ./data/caddy/config:/config
-
-  ftp:
-    image: pure-ftpd-ldap:latest
-    container_name: ftp
-    restart: always
-    networks:
-      - containet
-    ports:
-      - 21:21
-      - 30000:30000
-      - 30001:30001
-      - 30002:30002
-      - 30003:30003
-      - 30004:30004
-      - 30005:30005
-      - 30006:30006
-      - 30007:30007
-      - 30008:30008
-      - 30009:30009
-    command: bash /run.sh -d -c 10 -C 10 -l ldap:/pure_ftpd_ldap_config/pureftpd-ldap.conf -E -j -R -P ftp.home -p 30000:30009
-    volumes:
-      - ./external_hdd/data/ftp/storage:/home
-      - ./data/ftp/config:/pure_ftpd_ldap_config
+      - ./data/nginx/conf.d:/etc/nginx/conf.d
 
   flood:
     image: jesec/flood
