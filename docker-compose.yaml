@@ -1,0 +1,146 @@
+version: "2.1"
+
+networks:
+  containet:
+    driver: bridge
+
+services:
+
+  wg:
+    image: ngoduykhanh/wireguard-ui:latest-arm64
+    container_name: wgui
+    environment:
+      - WGUI_USERNAME=${USER_ACCOUNT}
+      - WGUI_PASSWORD=${PASSWORD}
+    networks:
+      - containet
+    volumes:
+      - ./data/wireguard_ui:/app/db
+      - /etc/wireguard:/etc/wireguard
+
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    network_mode: host
+    environment:
+      - TZ=Europe/Bucharest
+      - PIHOLE_DNS_=193.231.252.1;213.154.124.1
+      - ServerIP=10.8.0.1
+      - WEBPASSWORD=${PASSWORD}
+      - WEB_PORT=8080
+    volumes:
+      - ./data/pihole:/etc/pihole
+      - ./data/dnsmasq.d:/etc/dnsmasq.d
+    restart: unless-stopped
+
+  reverse-proxy:
+    image: caddy
+    container_name: reverse-proxy
+    restart: unless-stopped
+    networks:
+      - containet
+    ports:
+      - 80:80
+    volumes:
+      - ./data/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./data/caddy/site:/srv
+      - ./data/caddy:/data
+      - ./data/caddy/config:/config
+
+  ftp:
+    image: pure-ftpd-ldap:latest
+    container_name: ftp
+    networks:
+      - containet
+    ports:
+      - 21:21
+      - 30000:30000
+      - 30001:30001
+      - 30002:30002
+      - 30003:30003
+      - 30004:30004
+      - 30005:30005
+      - 30006:30006
+      - 30007:30007
+      - 30008:30008
+      - 30009:30009
+    command: bash /run.sh -d -c 10 -C 10 -l ldap:/pure_ftpd_ldap_config/pureftpd-ldap.conf -E -j -R -P ftp.home -p 30000:30009
+    volumes:
+      - ./external_hdd/data/ftp/storage:/home
+      - ./data/ftp/config:/pure_ftpd_ldap_config
+    restart: unless-stopped
+
+  flood:
+    container_name: flood
+    image: jesec/flood
+    restart: unless-stopped
+    networks:
+      - containet
+    command: --port 3001
+    environment:
+      - HOME=/config
+    volumes:
+      - ./data/flood:/config
+
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Bucharest
+    volumes:
+      - ./data/transmission:/config
+      - ./external_hdd/data/ftp/storage/public/downloads:/downloads
+      - ./external_hdd/data/ftp/storage/public/watch:/watch
+    networks:
+      - containet
+    ports:
+      - 51413:51413
+    restart: unless-stopped
+
+  openldap:
+    image: osixia/openldap:latest
+    container_name: openldap
+    networks:
+      - containet
+    ports:
+      - 389:389
+    volumes:
+      - ./data/openldap/var_lib_ldap:/var/lib/ldap
+      - ./data/openldap/etc_ldap_slapd.d:/etc/ldap/slapd.d
+    restart: always
+    environment:
+      - LDAP_ORGANISATION=server
+      - LDAP_DOMAIN=server.home
+      - LDAP_ADMIN_PASSWORD=${PASSWORD}
+      - LDAP_RFC2307BIS_SCHEMA=true
+      - LDAP_REMOVE_CONFIG_AFTER_SETUP=true
+      - LDAP_TLS_VERIFY_CLIENT=never
+
+  kanboard:
+    image: kanboard/kanboard:latest
+    container_name: kanboard
+    networks:
+      - containet
+    restart: always
+    volumes:
+      - ./data/kanboard/data:/var/www/app/data
+      - ./data/kanboard/plugins:/var/www/app/plugins
+    environment:
+      - PLUGIN_INSTALLER=true
+      - LDAP_AUTH=true
+      - LDAP_SERVER=ldap://openldap
+      - LDAP_PORT=389
+      - LDAP_SSL_VERIFY=false
+      - LDAP_START_TLS=false
+      - LDAP_BIND_TYPE=proxy
+      - LDAP_USERNAME=cn=admin,dc=server,dc=home
+      - LDAP_PASSWORD=${PASSWORD}
+      - LDAP_USER_BASE_DN=ou=people,dc=server,dc=home
+      - LDAP_USER_FILTER=(&(objectClass=person)(uid=%s))
+      - LDAP_GROUP_USER_ATTRIBUTE=dn
+      - LDAP_USER_ATTRIBUTE_USERNAME=uid
+      - LDAP_USER_ATTRIBUTE_FULLNAME=cn
+      - LDAP_USER_ATTRIBUTE_EMAIL=mail
+      - LDAP_USER_ATTRIBUTE_GROUPS=memberof
