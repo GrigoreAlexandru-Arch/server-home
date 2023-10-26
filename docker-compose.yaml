@@ -15,7 +15,7 @@ services:
       - containet
     volumes:
       - ./data/jellyfin/config:/config
-      - ./external_hd/data/jellyfin/cache:/cache
+      - ./external_hdd/data/jellyfin/cache:/cache
       - ./external_hdd/data/ftp/storage/public/downloads/complete/:/media:ro
 
   wg:
@@ -69,6 +69,21 @@ services:
     volumes:
       - ./data/flood:/config
 
+  ftp:
+    image: delfer/alpine-ftp-server
+    container_name: ftp
+    restart: unless-stopped
+    environment:
+      - USERS=transfer|transfer
+      - ADDRESS=10.8.0.1
+    ports:
+      - 21:21
+      - 21000-21010:21000-21010
+    networks:
+      - containet
+    volumes:
+      - ./external_hdd/data/ftp/storage:/ftp/transfer
+
   transmission:
     image: lscr.io/linuxserver/transmission:latest
     container_name: transmission
@@ -84,4 +99,3 @@ services:
     volumes:
       - ./data/transmission:/config
       - ./external_hdd/data/ftp/storage/public/downloads:/downloads
-      - ./external_hdd/data/ftp/storage/public/watch:/watch
