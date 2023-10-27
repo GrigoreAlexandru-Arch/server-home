@@ -43,6 +43,7 @@ services:
       - PIHOLE_DNS_=193.231.252.1;213.154.124.1
       - WEBPASSWORD=${PASSWORD}
       - WEB_PORT=8080
+      - BLOCKINGMODE=IP
       - VIRTUAL_HOST=pihole.home
       - VIRTUAL_PORT=8080
     network_mode: host
