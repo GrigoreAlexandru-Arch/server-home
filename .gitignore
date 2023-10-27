@@ -1,3 +1,10 @@
-data/
+data/*
+!data/dnsmasq.d
+data/dnsmasq.d/*
+!data/dnsmasq.d/05-pihole-custom-cname.conf
+!data/pihole
+data/pihole/*
+!data/pihole/custom.list
+!data/nginx/
 external_hdd/
 .env
