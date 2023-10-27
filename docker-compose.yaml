@@ -8,7 +8,7 @@ services:
   jellyfin:
     image: jellyfin/jellyfin
     container_name: jellyfin
-    restart: always
+    restart: unless-stopped
     environment:
       - JELLYFIN_PublishedServerUrl=http://jellyfin.home
     networks:
@@ -21,7 +21,7 @@ services:
   wg:
     image: ngoduykhanh/wireguard-ui:latest
     container_name: wgui
-    restart: always
+    restart: unless-stopped
     environment:
       - WGUI_USERNAME=${USER_ACCOUNT}
       - WGUI_PASSWORD=${PASSWORD}
@@ -34,11 +34,10 @@ services:
   pihole:
     image: pihole/pihole:latest
     container_name: pihole
-    restart: always
+    restart: unless-stopped
     environment:
       - TZ=Europe/Bucharest
       - PIHOLE_DNS_=193.231.252.1;213.154.124.1
-      - ServerIP=10.8.0.1
       - WEBPASSWORD=${PASSWORD}
       - WEB_PORT=8080
     network_mode: host
@@ -49,7 +48,7 @@ services:
   reverse-proxy:
     image: nginx
     container_name: reverse-proxy
-    restart: always
+    restart: unless-stopped
     networks:
       - containet
     ports:
@@ -60,7 +59,7 @@ services:
   flood:
     image: jesec/flood
     container_name: flood
-    restart: always
+    restart: unless-stopped
     environment:
       - HOME=/config
     networks:
@@ -87,7 +86,7 @@ services:
   transmission:
     image: lscr.io/linuxserver/transmission:latest
     container_name: transmission
-    restart: always
+    restart: unless-stopped
     environment:
       - PUID=1000
       - PGID=1000
