@@ -5,6 +5,5 @@ data/dnsmasq.d/*
 !data/pihole
 data/pihole/*
 !data/pihole/custom.list
-!data/nginx/
 external_hdd/
 .env

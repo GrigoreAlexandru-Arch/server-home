@@ -11,6 +11,8 @@ services:
     restart: unless-stopped
     environment:
       - JELLYFIN_PublishedServerUrl=http://jellyfin.home
+      - VIRTUAL_HOST=jellyfin.home
+      - VIRTUAL_PORT=8096
     networks:
       - containet
     volumes:
@@ -25,6 +27,7 @@ services:
     environment:
       - WGUI_USERNAME=${USER_ACCOUNT}
       - WGUI_PASSWORD=${PASSWORD}
+      - VIRTUAL_HOST=wgui.home
     networks:
       - containet
     volumes:
@@ -40,14 +43,15 @@ services:
       - PIHOLE_DNS_=193.231.252.1;213.154.124.1
       - WEBPASSWORD=${PASSWORD}
       - WEB_PORT=8080
-      - FTLCONF_LOCAL_IPV4=10.8.0.1
+      - VIRTUAL_HOST=pihole.home
+      - VIRTUAL_PORT=8080
     network_mode: host
     volumes:
       - ./data/pihole:/etc/pihole
       - ./data/dnsmasq.d:/etc/dnsmasq.d
 
   reverse-proxy:
-    image: nginx
+    image: nginxproxy/nginx-proxy
     container_name: reverse-proxy
     restart: unless-stopped
     networks:
@@ -55,7 +59,7 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./data/nginx/conf.d:/etc/nginx/conf.d
+      - /var/run/docker.sock:/tmp/docker.sock:ro
 
   flood:
     image: jesec/flood
@@ -63,6 +67,8 @@ services:
     restart: unless-stopped
     environment:
       - HOME=/config
+      - VIRTUAL_HOST=transmission.home
+      - VIRTUAL_PORT=3001
     networks:
       - containet
     command: --port 3001
