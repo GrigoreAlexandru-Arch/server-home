@@ -40,6 +40,7 @@ services:
       - PIHOLE_DNS_=193.231.252.1;213.154.124.1
       - WEBPASSWORD=${PASSWORD}
       - WEB_PORT=8080
+      - FTLCONF_LOCAL_IPV4=10.8.0.1
     network_mode: host
     volumes:
       - ./data/pihole:/etc/pihole
