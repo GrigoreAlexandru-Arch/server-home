@@ -1,7 +1,7 @@
 data/*
 !data/dnsmasq.d
 data/dnsmasq.d/*
-!data/dnsmasq.d/05-pihole-custom-cname.conf
+!data/dnsmasq.d/02-my-wildcard-dns.conf
 !data/pihole
 data/pihole/*
 !data/pihole/custom.list
