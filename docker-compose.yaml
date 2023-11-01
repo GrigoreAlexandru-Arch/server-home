@@ -50,6 +50,19 @@ services:
       - ./data/pihole:/etc/pihole
       - ./data/dnsmasq.d:/etc/dnsmasq.d
 
+  certs-generator:
+    image: jwilder/docker-gen
+    container_name: certs-generator
+    restart: unless-stopped
+    networks:
+      - containet
+    command: -watch -only-exposed -notify /certs/generate.sh -notify-container reverse-proxy -notify-signal -1 /etc/docker-gen/templates/certs.tmpl /config/certs.cnf
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./data/certs-generator/templates:/etc/docker-gen/templates
+      - ./data/certs-generator/config:/config
+      - ./data/certs:/certs
+
   reverse-proxy:
     image: nginxproxy/nginx-proxy
     container_name: reverse-proxy

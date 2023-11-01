@@ -1,0 +1,13 @@
+[ req ]
+distinguished_name = req_distinguished_name
+x509_extensions    = v3_ca
+prompt             = no
+[ req_distinguished_name ]
+C   = RO
+O   = Server Home
+CN  = *.home
+[ v3_ca ]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints = critical,CA:true
+subjectAltName = DNS:*.home, DNS:pihole.home, DNS:jellyfin.home, DNS:transmission.home, DNS:vaultwarden.home, DNS:wgui.home

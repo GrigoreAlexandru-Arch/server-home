@@ -5,5 +5,10 @@ data/dnsmasq.d/*
 !data/pihole
 data/pihole/*
 !data/pihole/custom.list
+!data/certs
+data/certs/*
+!data/certs/generate.sh
+!data/certs/root.cnf
+!data/certs-generator
 external_hdd/
 .env
