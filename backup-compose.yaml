@@ -1,0 +1,17 @@
+services:
+  rclone:
+    image: rclone/rclone:latest
+    container_name: rclone
+    restart: no
+    volumes:
+      - ./data/rclone/rclone.conf:/config/rclone/rclone.conf:ro
+      - ./data/vaultwarden:/data
+    command:
+      [
+        "sync",
+        "/data",
+        "crypt:vaultwarden",
+        "--config",
+        "/config/rclone/rclone.conf",
+        "--progress",
+      ]
