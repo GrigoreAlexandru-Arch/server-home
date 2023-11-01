@@ -58,8 +58,10 @@ services:
       - containet
     ports:
       - 80:80
+      - 443:443
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./data/certs:/etc/nginx/certs
 
   flood:
     image: jesec/flood
@@ -89,6 +91,18 @@ services:
       - containet
     volumes:
       - ./external_hdd/data/ftp/storage:/ftp/transfer
+
+  vaultwarden:
+    image: vaultwarden/server
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      - VIRTUAL_HOST=vaultwarden.home
+      - VIRTUAL_PORT=80
+    networks:
+      - containet
+    volumes:
+      - ./data/vaultwarden:/data
 
   transmission:
     image: lscr.io/linuxserver/transmission:latest
