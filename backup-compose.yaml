@@ -10,7 +10,7 @@ services:
       [
         "sync",
         "/data",
-        "crypt:vaultwarden",
+        "gdrive:vaultwarden",
         "--config",
         "/config/rclone/rclone.conf",
         "--progress",
