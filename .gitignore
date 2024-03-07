@@ -12,5 +12,6 @@ data/certs/*
 !data/certs-generator
 data/certs-generator/*
 !data/certs-generator/templates
+!data/unbound/unbound.conf
 external_hdd/
 .env
