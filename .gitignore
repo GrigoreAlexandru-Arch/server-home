@@ -2,6 +2,7 @@ data/*
 !data/dnsmasq.d
 data/dnsmasq.d/*
 !data/dnsmasq.d/02-my-wildcard-dns.conf
+!data/dnsmasq.d/99-edns.conf
 !data/pihole
 data/pihole/*
 !data/pihole/custom.list
