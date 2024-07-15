@@ -9,6 +9,7 @@ services:
     image: jellyfin/jellyfin
     container_name: jellyfin
     restart: unless-stopped
+    privileged: true
     environment:
       - JELLYFIN_PublishedServerUrl=http://jellyfin.home
       - VIRTUAL_HOST=jellyfin.home
@@ -17,6 +18,11 @@ services:
       - containet
     ports:
       - 8096:8096
+    command: 'for dev in dri dma_heap mali0 rga mpp_service
+      iep mpp-service vpu_service vpu-service
+      hevc_service hevc-service rkvdec rkvenc vepu h265e ; do
+      [ -e "/dev/$dev" ] && devices="$devices --device /dev/$dev";
+      done;'
     volumes:
       - ./data/jellyfin/config:/config
       - ./external_hdd/data/jellyfin/cache:/cache
