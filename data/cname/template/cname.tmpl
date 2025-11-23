@@ -1,0 +1,7 @@
+{{- range $host, $containers := groupByMulti . "Env.VIRTUAL_HOST" "," }}
+  {{- if $host }}
+    {{- range $i, $container := $containers }}
+{{ $host }},{{ coalesce $container.Env.CNAME_SERVER "server.home" }}
+    {{- end }}
+  {{- end }}
+{{- end }}

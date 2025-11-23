@@ -12,6 +12,7 @@ services:
       - JELLYFIN_PublishedServerUrl=http://jellyfin.home
       - VIRTUAL_HOST=jellyfin.home
       - VIRTUAL_PORT=8096
+      - CERT_NAME=home
     networks:
       - containet
     ports:
@@ -25,6 +26,16 @@ services:
       - /dev/dma_heap:/dev/dma_heap
       - /dev/rga:/dev/rga
       - /dev/mpp_service:/dev/mpp_service
+      - /dev/iep
+      - /dev/mpp-service
+      - /dev/vpu_service
+      - /dev/vpu-service
+      - /dev/hevc_service
+      - /dev/hevc-service
+      - /dev/rkvdec
+      - /dev/rkvenc
+      - /dev/vepu
+      - /dev/h265e
     security_opt:
       - systempaths=unconfined
       - apparmor=unconfined
@@ -37,11 +48,24 @@ services:
       - WGUI_USERNAME=${USER_ACCOUNT}
       - WGUI_PASSWORD=${PASSWORD}
       - VIRTUAL_HOST=wgui.home
+      - CERT_NAME=home
     networks:
       - containet
     volumes:
       - ./data/wireguard_ui:/app/db
       - /etc/wireguard:/etc/wireguard
+
+  cnames-generator:
+    image: jwilder/docker-gen
+    container_name: cnames-generator
+    restart: unless-stopped
+    networks:
+      - containet
+    command: -watch -notify-container pihole -notify-signal -1 /etc/docker-gen/templates/cname.tmpl /cname_output/cname_output
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./data/cname/template:/etc/docker-gen/templates
+      - ./data/cname/output:/cname_output
 
   pihole:
     image: pihole/pihole:latest
@@ -49,23 +73,33 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Europe/Bucharest
-      - PIHOLE_DNS_=127.0.0.1#5335
-      - WEBPASSWORD=${PASSWORD}
-      - WEB_PORT=8080
+      - FTLCONF_dns_upstreams=unbound
+      - FTLCONF_webserver_api_password=${PASSWORD}
+      - FTLCONF_webserver_port=80
+      - FTLCONF_dns_listeningMode=ALL
       - VIRTUAL_HOST=pihole.home
-      - VIRTUAL_PORT=8080
-    network_mode: host
+      - VIRTUAL_PORT=80
+      - CERT_NAME=home
+    networks:
+      - containet
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
     volumes:
       - ./data/pihole:/etc/pihole
       - ./data/dnsmasq.d:/etc/dnsmasq.d
+      - ./data/cname/output:/cname_output
+      - ./data/pihole-dyn:/pihole-dyn
+    cap_add:
+      - SYS_NICE
+    entrypoint: ["/bin/bash", "/pihole-dyn/pihole-wrapper.sh"]
 
   unbound:
     image: alpinelinux/unbound:latest
     container_name: unbound
     restart: unless-stopped
-    cap_add:
-      - NET_ADMIN
-    network_mode: host
+    networks:
+      - containet
     volumes:
       - ./data/unbound:/etc/unbound/
 
@@ -75,7 +109,7 @@ services:
     restart: unless-stopped
     networks:
       - containet
-    command: -watch -only-exposed -notify /certs/generate.sh -notify-container reverse-proxy -notify-signal -1 /etc/docker-gen/templates/certs.tmpl /config/certs.cnf
+    command: -watch -notify /certs/generate.sh -notify-container reverse-proxy -notify-signal -1 /etc/docker-gen/templates/certs.tmpl /config/certs.cnf
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./data/certs-generator/templates:/etc/docker-gen/templates
@@ -94,20 +128,19 @@ services:
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./data/certs:/etc/nginx/certs
+      - ./data/reverse-proxy:/etc/nginx/vhost.d
 
   flood:
     image: jesec/flood
     container_name: flood
     restart: unless-stopped
     environment:
-      - HOME=/config
       - VIRTUAL_HOST=transmission.home
       - VIRTUAL_PORT=3001
+      - CERT_NAME=home
     networks:
       - containet
     command: --port 3001
-    volumes:
-      - ./data/flood:/config
 
   ftp:
     image: delfer/alpine-ftp-server
@@ -129,21 +162,25 @@ services:
     container_name: vaultwarden
     restart: unless-stopped
     environment:
+      - DOMAIN=https://vaultwarden.home
       - VIRTUAL_HOST=vaultwarden.home
       - VIRTUAL_PORT=80
+      - CERT_NAME=home
     networks:
       - containet
     volumes:
       - ./data/vaultwarden:/data
 
   transmission:
-    image: lscr.io/linuxserver/transmission:latest
+    image: lscr.io/linuxserver/transmission:4.0.5
     container_name: transmission
     restart: unless-stopped
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Bucharest
+      - USER=${USER_ACCOUNT}
+      - PASS=${PASSWORD}
     networks:
       - containet
     ports:
@@ -152,32 +189,31 @@ services:
       - ./data/transmission:/config
       - ./external_hdd/data/ftp/storage/public/downloads:/downloads
 
-  openproject:
-    image: openproject/community:13
-    container_name: openproject
-    restart: unless-stopped
-    environment:
-      - OPENPROJECT_HOST__NAME=project.home
-      - OPENPROJECT_SECRET_KEY_BASE=${OPENPROJECT_KEY_BASE}
-      - VIRTUAL_HOST=project.home
-      - VIRTUAL_PORT=80
-    networks:
-      - containet
-    volumes:
-      - ./data/openproject/pgdata:/var/openproject/pgdata
-      - ./data/openproject/assets:/var/openproject/assets
-
   portainer:
-    image: portainer/portainer-ce:lts
+    image: portainer/portainer-ce
     container_name: portainer
     restart: unless-stopped
     environment:
       - VIRTUAL_HOST=portainer.home
-      - VIRTUAL_PORT=9443
+      - VIRTUAL_PORT=9000
+      - CERT_NAME=home
     networks:
       - containet
-    ports:
-      - 9443:9443
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data/portainer:/data
+
+  duplicati:
+    image: duplicati/duplicati
+    container_name: duplicati
+    restart: unless-stopped
+    environment:
+      - DUPLICATI__WEBSERVICE_PASSWORD=${PASSWORD}
+      - DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES=duplicati.home
+      - VIRTUAL_HOST=duplicati.home
+      - VIRTUAL_PORT=8200
+      - CERT_NAME=home
+    networks:
+      - containet
+    volumes:
+      - ./data:/data

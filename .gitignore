@@ -3,10 +3,9 @@ data/*
 data/dnsmasq.d/*
 !data/dnsmasq.d/02-my-wildcard-dns.conf
 !data/dnsmasq.d/99-edns.conf
-!data/pihole
-data/pihole/*
-!data/pihole/custom.list
 !data/certs
+!data/cname
+data/cname/output
 data/certs/*
 !data/certs/generate.sh
 !data/certs/root.cnf
