@@ -77,6 +77,9 @@ services:
       - FTLCONF_webserver_api_password=${PASSWORD}
       - FTLCONF_webserver_port=80
       - FTLCONF_dns_listeningMode=ALL
+      - FTLCONF_dns_hostRecord=server.home,10.8.0.1
+      - FTLCONF_dns_domain_name=home
+      - FTLCONF_misc_privacyLevel=3
       - VIRTUAL_HOST=pihole.home
       - VIRTUAL_PORT=80
       - CERT_NAME=home
