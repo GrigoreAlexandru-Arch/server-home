@@ -13,5 +13,6 @@ data/certs/*
 data/certs-generator/*
 !data/certs-generator/templates
 !data/unbound/unbound.conf
+!data/hermes-proxy
 external_hdd/
 .env
