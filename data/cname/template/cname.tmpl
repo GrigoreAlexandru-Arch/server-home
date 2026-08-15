@@ -1,7 +1,11 @@
+{{- /* pihole.home is static so a pihole restart cannot change output and feed the notify loop */ -}}
+pihole.home,server.home
 {{- range $host, $containers := groupByMulti . "Env.VIRTUAL_HOST" "," }}
-  {{- if $host }}
+  {{- if and $host (ne $host "pihole.home") }}
     {{- range $i, $container := $containers }}
+      {{- if and $container.State.Running (or (not $container.State.Health) (eq $container.State.Health.Status "") (eq $container.State.Health.Status "healthy")) }}
 {{ $host }},{{ coalesce $container.Env.CNAME_SERVER "server.home" }}
+      {{- end }}
     {{- end }}
   {{- end }}
 {{- end }}

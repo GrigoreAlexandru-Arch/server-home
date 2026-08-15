@@ -16,3 +16,8 @@ data/certs-generator/*
 !data/hermes-proxy
 external_hdd/
 .env
+
+# workspace artifacts
+data/**/*.bak-*
+docker-compose.yaml.bak-*
+.sops-age-key.txt

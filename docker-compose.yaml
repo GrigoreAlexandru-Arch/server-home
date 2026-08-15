@@ -8,6 +8,10 @@ services:
     container_name: jellyfin
     restart: unless-stopped
     privileged: true
+    user: "1000:1000"
+    group_add:
+      - "44"
+      - "993"
     mem_limit: 2g
     mem_reservation: 1g
     cpus: 4
@@ -47,6 +51,12 @@ services:
     image: ngoduykhanh/wireguard-ui:0.6.2
     container_name: wgui
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:5000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     mem_limit: 128m
     mem_reservation: 64m
     environment:
@@ -61,9 +71,15 @@ services:
       - /etc/wireguard:/etc/wireguard
 
   cnames-generator:
-    image: jwilder/docker-gen:0.16.2
+    image: jwilder/docker-gen:0.17.2
     container_name: cnames-generator
     mem_limit: 64m
+    healthcheck:
+      test: ["CMD-SHELL", "[ \"$(cat /proc/1/comm)\" = \"docker-gen\" ]"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     mem_reservation: 32m
     restart: unless-stopped
     networks:
@@ -75,7 +91,7 @@ services:
       - ./data/cname/output:/cname_output
 
   pihole:
-    image: pihole/pihole:2026.05.0
+    image: pihole/pihole:2026.07.2
     container_name: pihole
     restart: unless-stopped
     mem_limit: 256m
@@ -107,9 +123,15 @@ services:
     entrypoint: ["/bin/bash", "/pihole-dyn/pihole-wrapper.sh"]
 
   unbound:
-    image: alpinelinux/unbound:latest
+    image: alpinelinux/unbound@sha256:3faee768f01493d8bda49e7815923b6c2036640da81ef6aa472c369922a913dc
     container_name: unbound
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -x unbound > /dev/null"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     mem_limit: 128m
     mem_reservation: 64m
     networks:
@@ -118,10 +140,16 @@ services:
       - ./data/unbound:/etc/unbound/
 
   certs-generator:
-    image: jwilder/docker-gen:0.16.2
+    image: jwilder/docker-gen:0.17.2
     container_name: certs-generator
     restart: unless-stopped
     mem_limit: 64m
+    healthcheck:
+      test: ["CMD-SHELL", "[ \"$(cat /proc/1/comm)\" = \"docker-gen\" ]"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     mem_reservation: 32m
     networks:
       - containet
@@ -133,9 +161,15 @@ services:
       - ./data/certs:/certs
 
   reverse-proxy:
-    image: nginxproxy/nginx-proxy:1.10.2
+    image: nginxproxy/nginx-proxy:1.11.6
     container_name: reverse-proxy
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-s", "-o", "/dev/null", "http://localhost:80/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     mem_limit: 256m
     mem_reservation: 128m
     networks:
@@ -148,27 +182,33 @@ services:
       - ./data/certs:/etc/nginx/certs
       - ./data/reverse-proxy:/etc/nginx/vhost.d
 
-  ftp:
-    image: delfer/alpine-ftp-server
-    container_name: ftp
+  filebrowser:
+    image: gtstef/filebrowser:1.5.2-stable-slim
+    container_name: filebrowser
     restart: unless-stopped
-    mem_limit: 64m
-    mem_reservation: 32m
+    mem_limit: 128m
+    mem_reservation: 64m
     environment:
-      - USERS=transfer|transfer
-      - ADDRESS=10.8.0.1
-    ports:
-      - 21:21
-      - 21000-21010:21000-21010
+      - FILEBROWSER_ADMIN_PASSWORD=${PASSWORD}
+      - VIRTUAL_HOST=files.home
+      - VIRTUAL_PORT=80
+      - CERT_NAME=home
     networks:
       - containet
     volumes:
-      - ./external_hdd/data/ftp/storage:/ftp/transfer
+      - ./data/filebrowser:/home/filebrowser/data
+      - ./external_hdd/data/ftp/storage:/srv
 
   hermes-proxy:
-    image: nginx:alpine
+    image: nginx:1.31.3-alpine
     container_name: hermes-proxy
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-s", "-o", "/dev/null", "http://localhost:80/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     mem_limit: 64m
     mem_reservation: 32m
     networks:
@@ -184,6 +224,7 @@ services:
     image: vaultwarden/server:1.37.1
     container_name: vaultwarden
     restart: unless-stopped
+    user: "1000:1000"
     mem_limit: 256m
     mem_reservation: 128m
     environment:
@@ -197,9 +238,15 @@ services:
       - ./data/vaultwarden:/data
 
   transmission:
-    image: lscr.io/linuxserver/transmission:4.0.5
+    image: lscr.io/linuxserver/transmission:4.1.3
     container_name: transmission
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -o /dev/null http://localhost:9091/transmission/rpc"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     mem_limit: 512m
     mem_reservation: 256m
     environment:
@@ -221,7 +268,7 @@ services:
       - ./external_hdd/data/ftp/storage/public/downloads:/downloads
 
   portainer:
-    image: portainer/portainer-ce:2.42.0
+    image: portainer/portainer-ce:2.44.0
     container_name: portainer
     restart: unless-stopped
     mem_limit: 256m
@@ -237,9 +284,16 @@ services:
       - ./data/portainer:/data
 
   duplicati:
-    image: duplicati/duplicati:2.3.0.1
+    image: duplicati/duplicati:2.3.0.4
     container_name: duplicati
     restart: unless-stopped
+    user: "1000:1000"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8200'"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     mem_limit: 512m
     mem_reservation: 256m
     environment:
@@ -253,35 +307,16 @@ services:
     volumes:
       - ./data:/data
 
-  netdata:
-    image: netdata/netdata:stable
-    container_name: netdata
-    restart: unless-stopped
-    mem_limit: 256m
-    mem_reservation: 128m
-    hostname: server.home
-    networks:
-      - containet
-    environment:
-      - DOCKER_USR=root
-      - VIRTUAL_HOST=netdata.home
-      - VIRTUAL_PORT=19999
-      - CERT_NAME=home
-    cap_add:
-      - SYS_PTRACE
-      - SYS_ADMIN
-    security_opt:
-      - apparmor=unconfined
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /etc/os-release:/host/etc/os-release:ro
-
   dozzle:
-    image: amir20/dozzle:latest
+    image: amir20/dozzle:v10.7.1
     container_name: dozzle
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/dozzle", "healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     mem_limit: 64m
     mem_reservation: 32m
     networks:
@@ -292,3 +327,31 @@ services:
       - CERT_NAME=home
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  syncthing:
+    image: syncthing/syncthing:2.1.3
+    container_name: syncthing
+    restart: unless-stopped
+    hostname: server-home-syncthing
+    mem_limit: 256m
+    mem_reservation: 128m
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - SYNCTHING_GUI_USER=admin
+      - SYNCTHING_GUI_PASSWORD=${PASSWORD}
+      - SYNCTHING_FOLDERS=obsidian:/var/syncthing/obsidian
+      - VIRTUAL_HOST=syncthing.home
+      - VIRTUAL_PORT=8384
+      - CERT_NAME=home
+    networks:
+      - containet
+    ports:
+      - 22000:22000/tcp
+      - 22000:22000/udp
+      - 21027:21027/udp
+    volumes:
+      - ./data/syncthing:/var/syncthing/config
+      - ./data/obsidian:/var/syncthing/obsidian
+      - ./data/syncthing/entrypoint.sh:/entrypoint.sh:ro
