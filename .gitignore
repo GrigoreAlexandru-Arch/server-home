@@ -17,6 +17,7 @@ data/certs-generator/*
 data/filebrowser/*
 !data/filebrowser/config.yaml
 !data/hermes-proxy
+!data/homepage
 external_hdd/
 .env
 

@@ -1,0 +1,8 @@
+---
+# Info widgets (top of page).
+# The Docker panel (from docker.yaml) carries the real per-service CPU/Mem/Net.
+# This resources card reflects the homepage container itself (container-scoped).
+- resources:
+    cpu: true
+    memory: true
+    uptime: true

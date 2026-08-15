@@ -1,0 +1,70 @@
+- Media:
+    - Jellyfin:
+        icon: 🎬
+        href: https://jellyfin.home
+        description: Media server
+        server: server-home
+        container: jellyfin
+    - Transmission:
+        icon: ⬇️
+        href: https://transmission.home
+        description: Torrent client
+        server: server-home
+        container: transmission
+- Security & Network:
+    - Vaultwarden:
+        icon: 🔐
+        href: https://vaultwarden.home
+        description: Password manager
+        server: server-home
+        container: vaultwarden
+    - Pi-hole:
+        icon: 🛡️
+        href: https://pihole.home
+        description: Ad blocker / DNS
+        server: server-home
+        container: pihole
+    - WireGuard UI:
+        icon: 🖧
+        href: https://wgui.home
+        description: VPN management
+        server: server-home
+        container: wgui
+- Files & Sync:
+    - FileBrowser:
+        icon: 📁
+        href: https://files.home
+        description: File transfer
+        server: server-home
+        container: filebrowser
+    - Syncthing:
+        icon: 🔄
+        href: https://syncthing.home
+        description: File sync
+        server: server-home
+        container: syncthing
+- Admin:
+    - Portainer:
+        icon: 🐳
+        href: https://portainer.home
+        description: Container management
+        server: server-home
+        container: portainer
+    - Duplicati:
+        icon: 💾
+        href: https://duplicati.home
+        description: Backups
+        server: server-home
+        container: duplicati
+    - Dozzle:
+        icon: 📜
+        href: https://dozzle.home
+        description: Log viewer
+        server: server-home
+        container: dozzle
+    - Hermes:
+        icon: 🤖
+        href: https://hermes.home
+        description: AI assistant
+        server: server-home
+        container: hermes-proxy
