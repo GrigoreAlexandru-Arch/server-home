@@ -1,4 +1,4 @@
-- Media:
+- Media & Files:
     - Jellyfin:
         icon: /images/icons/jellyfin.svg
         href: https://jellyfin.home
@@ -17,6 +17,22 @@
           username: {{HOMEPAGE_VAR_USER}}
           password: {{HOMEPAGE_VAR_PASSWORD}}
           rpcUrl: /transmission/
+    - FileBrowser:
+        icon: /images/icons/filebrowser.svg
+        href: https://files.home
+        description: File transfer
+        server: server-home
+        container: filebrowser
+    - Syncthing:
+        icon: /images/icons/syncthing.svg
+        href: https://syncthing.home
+        description: File sync
+        server: server-home
+        container: syncthing
+        widget:
+          type: syncthing
+          url: http://syncthing:8384
+          key: {{HOMEPAGE_VAR_SYNCTHING_APIKEY}}
 - Security & Network:
     - Vaultwarden:
         icon: /images/icons/vaultwarden.svg
@@ -41,24 +57,7 @@
         description: VPN management
         server: server-home
         container: wgui
-- Files & Sync:
-    - FileBrowser:
-        icon: /images/icons/filebrowser.svg
-        href: https://files.home
-        description: File transfer
-        server: server-home
-        container: filebrowser
-    - Syncthing:
-        icon: /images/icons/syncthing.svg
-        href: https://syncthing.home
-        description: File sync
-        server: server-home
-        container: syncthing
-        widget:
-          type: syncthing
-          url: http://syncthing:8384
-          key: {{HOMEPAGE_VAR_SYNCTHING_APIKEY}}
-- Admin:
+- Admin & Tools:
     - Portainer:
         icon: /images/icons/portainer.svg
         href: https://portainer.home

@@ -1,23 +1,20 @@
 title: server.home
 theme: dark
-color: violet
+color: red
 statusStyle: dot
 headerStyle: clean
 fullWidth: true
 useEqualHeights: true
 background:
   image: /images/bg.svg
-cardBlur: lg
+cardBlur: md
 layout:
-  Media:
+  Media & Files:
     style: row
     columns: 4
   Security & Network:
     style: row
     columns: 4
-  Files & Sync:
-    style: row
-    columns: 4
-  Admin:
+  Admin & Tools:
     style: row
     columns: 4

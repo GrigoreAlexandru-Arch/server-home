@@ -1,9 +1,8 @@
 /* ============================================================
-   server.home dashboard — vivid glassmorphism theme
+   server.home dashboard — slick sharp glass (black + red)
    ============================================================ */
 
-/* --- Global --- */
-html, body, #__next, #app {
+html, body, #__next {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -11,89 +10,77 @@ html, body, #__next, #app {
 
 main { scrollbar-gutter: stable; }
 
-/* --- Page title / header (best-effort, component-rendered) --- */
-/* The dashboard header container: give it a subtle glass bar so the vivid
-   background peeks through but the title/clock stay readable. */
-div.relative.m-auto.flex.flex-col > div:first-child {
-  /* soft glass pill for the header row */
+/* --- Page gutter: tighten the default ~36px wrap margin --- */
+.relative.m-auto.flex.flex-col > div.flex.flex-wrap {
+  margin: 1rem !important;
+}
+@media (min-width: 640px) {
+  .relative.m-auto.flex.flex-col > div.flex.flex-wrap {
+    margin: 1.25rem !important;
+  }
 }
 
-/* --- Group headings: bolder, brighter, letter-spaced --- */
+/* --- Group heading: small crisp uppercase label, red accent --- */
 .services-group h2.service-group-name {
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-transform: none;
-  color: #f1f5f9 !important;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  color: rgba(239, 68, 68, 0.72) !important;
 }
 
-/* --- Service card: vivid glassmorphism ---
-   The card div carries tailwind utilities (bg-white/5, backdrop-blur-lg,
-   rounded-md, p-1). We must beat/inline those with !important. */
+/* --- Tighten vertical rhythm between cards --- */
+.services-list { margin-top: 0.5rem !important; }
+.services-list li.service { margin-bottom: 0.5rem !important; }
+
+/* --- Service card: frosted white glass on black, SHARP corners --- */
 .service-card {
+  border-radius: 0 !important;
   background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.12) 0%,
-    rgba(255, 255, 255, 0.05) 45%,
-    rgba(255, 255, 255, 0.02) 100%
+    180deg,
+    rgba(255, 255, 255, 0.09) 0%,
+    rgba(255, 255, 255, 0.04) 100%
   ) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(150%) !important;
-  backdrop-filter: blur(14px) saturate(150%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  border-top-color: rgba(255, 255, 255, 0.24) !important;
-  border-radius: 20px !important;
-  box-shadow:
-    0 10px 30px -8px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease !important;
+  -webkit-backdrop-filter: blur(12px) saturate(120%) !important;
+  backdrop-filter: blur(12px) saturate(120%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.6) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+              background 0.15s ease, border-color 0.15s ease !important;
+  padding: 6px 8px !important;
 }
 
 .service-card:hover {
-  transform: translateY(-3px) !important;
+  transform: translateY(-2px) !important;
   background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.16) 0%,
-    rgba(255, 255, 255, 0.07) 50%,
-    rgba(255, 255, 255, 0.03) 100%
+    180deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0.07) 100%
   ) !important;
-  border-color: rgba(255, 255, 255, 0.24) !important;
+  border-color: rgba(239, 68, 68, 0.45) !important;
+  border-top-color: rgba(239, 68, 68, 0.65) !important;
   box-shadow:
-    0 18px 40px -10px rgba(0, 0, 0, 0.65),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+    0 14px 28px -10px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(239, 68, 68, 0.25) !important;
 }
 
-/* --- Icon: bigger, vibrantly shown against glass --- */
+/* --- Icon --- */
 .service-icon img {
-  width: 44px !important;
-  height: 44px !important;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+  width: 40px !important;
+  height: 40px !important;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.5));
 }
 
-/* --- Service title / description on glass --- */
-.service-title {
-  font-weight: 600;
-  color: #f8fafc !important;
-}
-
-/* Description line under a service name (light-weight muted) */
+/* --- Title / description --- */
+.service-title { font-weight: 600; color: #f5f5f5 !important; }
 p.text-theme-500 {
-  color: rgba(226, 232, 240, 0.72) !important;
+  color: rgba(161, 161, 170, 0.9) !important;
+  font-size: 0.8rem;
 }
 
-/* --- Status dot: keep clean but add a glow ring so it reads on glass --- */
+/* --- Status indicator: sharp square, subtle glow (keep semantic color) --- */
 .service-card [class*="rounded-full"] {
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.25), 0 0 8px currentColor;
-}
-
-/* --- Grid gap: a touch denser/tighter rhythm --- */
-.services-list li.service {
-  margin-bottom: 0.75rem;
-}
-
-/* --- Footer / misc group containers: nothing to do --- */
-
-/* --- Vivid accent used by Homepage's theme (status text, links) via CSS var.
-       Tailwind uses --tw-theme-*; surface a hint only. */
-:root {
-  /* violet accent to match the bg glow */
-  --color-accent-hint: #a78bfa;
+  border-radius: 0 !important;
+  box-shadow: 0 0 8px currentColor;
 }

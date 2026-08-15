@@ -1,16 +1,16 @@
 ---
 version: alpha
 name: server.home
-description: Vivid glassmorphism launcher for a self-hosted homelab. Deep violet canvas with violet/magenta/cyan glows, glassy translucent tiles, dense rounded grid.
+description: Slick sharp black-glass launcher for a self-hosted homelab. Near-black canvas with a restrained red accent, frosted white glass tiles, sharp square corners, tight spacing.
 colors:
-  primary: "#F1F5F9"
-  secondary: "#A5B4FC"
-  tertiary: "#22D3EE"
-  neutral: "#12081F"
-  on-tertiary: "#0B0617"
-  accent: "#A78BFA"
+  primary: "#F5F5F5"
+  secondary: "#A1A1AA"
+  tertiary: "#EF4444"
+  neutral: "#000000"
+  on-tertiary: "#0A0A0C"
+  accent: "#EF4444"
   glass: "rgba(255,255,255,0.06)"
-  glass-border: "rgba(255,255,255,0.14)"
+  glass-border: "rgba(255,255,255,0.12)"
 typography:
   body-md:
     fontFamily: Inter, system-ui, sans-serif
@@ -18,28 +18,28 @@ typography:
     lineHeight: 1.5
   h2:
     fontFamily: Inter, system-ui, sans-serif
-    fontSize: 1.125rem
-    fontWeight: 700
+    fontSize: 1.0625rem
+    fontWeight: 600
     lineHeight: 1.3
   label-caps:
     fontFamily: Inter, system-ui, sans-serif
-    fontSize: 0.75rem
+    fontSize: 0.7rem
     fontWeight: 600
     letterSpacing: "0.08em"
 rounded:
-  md: 20px
-  lg: 24px
+  md: 0px
+  lg: 0px
 spacing:
-  sm: 8px
-  md: 16px
-  lg: 24px
-  xl: 40px
+  sm: 6px
+  md: 10px
+  lg: 14px
+  xl: 20px
 components:
   card:
     backgroundColor: "{colors.glass}"
     textColor: "{colors.primary}"
     rounded: "{rounded.md}"
-    padding: 20px
+    padding: 8px
     borderColor: "{colors.glass-border}"
   accent-chip:
     backgroundColor: "{colors.accent}"
@@ -50,62 +50,47 @@ components:
 
 ## Overview
 
-A self-hosted dashboard should feel like a bright, colorful control room — not a
-dense wall of tiny links, and not a flat grey panel. The identity leans on a deep
-violet-magenta canvas with soft glowing color blobs, glassy translucent tiles that
-let that color shimmer through, and one vivid accent family (violet/magenta/cyan)
-used for emphasis. Tiles read as rounded glass chips that lift gently on hover, and
-the page lays out as a dense app grid so everything is reachable at a glance.
+A self-hosted dashboard should feel like a clean, modern control surface — not a wall of
+tiny links and not a soft pastel panel. The identity leans on a near-black canvas with a
+single restrained red accent, frosted white glass tiles, and sharp square corners. Red is
+reserved for emphasis (hover state, group labels); the tiles themselves stay neutral glass
+so the accent reads as intentional rather than loud.
 
 ## Colors
 
-- **Primary (#F1F5F9):** Primary text on dark surfaces — soft slate-white, not pure
-  white, to reduce glare against the vivid background.
-- **Secondary (#A5B4FC):** Muted text, descriptions, and metadata. Sets hierarchy
-  under primary without competing with the colorful glass.
-- **Tertiary (#22D3EE):** Cyan — one of the three glow/accent colors, used sparingly
-  for status highlights and hover affordances.
-- **Neutral (#12081F):** Deep violet-navy canvas origin. Cards are translucent over
-  this rather than opaque, so color shows through.
-- **Accent (#A78BFA):** Violet accent used for the page's emphasis and the vivid
-  chip; pairs with magenta/cyan glows in the background.
-- **Glass (rgba(255,255,255,0.06)) + Glass-border (rgba(255,255,255,0.14)):**
-  The tile surface — translucent white with a light top edge — over the dark canvas.
+- **Primary (#F5F5F5):** Primary text on dark surfaces — near-white.
+- **Secondary (#A1A1AA):** Muted gray for descriptions and metadata.
+- **Tertiary / Accent (#EF4444):** Red — the single accent, used for hover emphasis and
+  group labels. Kept low-frequency so it stays "black with red", not "red".
+- **Neutral (#000000):** Near-black canvas origin; tiles are translucent over this.
+- **Glass (rgba(255,255,255,0.06)) + Glass-border (rgba(255,255,255,0.12)):** Frosted
+  white glass surface and edge over the dark canvas.
 
 ## Typography
 
-Inter with system fallbacks throughout. Hierarchy comes from weight and size, not
-family or color: `h2` (weight 700) for group and card titles, `body-md` for content,
-`label-caps` for small section labels. Heavier title weights keep names legible on
-top of the colorful glass.
+Inter with system fallbacks. Hierarchy from weight and size: `h2` (weight 600) for group and
+card titles, `body-md` for content, `label-caps` (small caps, letter-spaced) for section labels.
 
 ## Layout
 
-Rows of services render as a dense, responsive grid (up to 4 columns) rather than
-narrow side-by-side lists, so the page reads as a wall of launchers. Full-width with
-equal tile heights. Spacing: `lg` between cards, `xl` around the page edge, `md`
-inside a card so icons can breathe.
+Rows of services render as a dense, responsive grid (up to 4 columns). Full-width with tight
+spacing: `lg` between cards, `xl` around the page edge, `md` inside a card.
 
 ## Shapes
 
-Tiles use `md` (20px) rounding — chunky and modern, matching a rounded app launcher.
-Radius scales to `lg` (24px) on the largest surfaces.
+Tiles use `md` (0px) rounding — sharp, square corners throughout.
 
 ## Components
 
-- `card` is the default launcher surface: a translucent glass chip (`glass` fill,
-  `glass-border` edge) with a blur+saturate backdrop, so the vivid background blurs
-  through behind it.
-- `accent-chip` is the high-emphasis element — a violet chip reserved for live status
-  or a single highlighted action per view.
-- Icons are local brand SVGs at ~44px with a soft drop shadow to sit on the glass.
+- `card` is the launcher surface: frosted white glass (glass fill, glass-border edge) with a
+  blur backdrop; red accent appears on hover.
+- `accent-chip` is the high-emphasis element — red, reserved for a single highlighted action.
+- Icons are local brand SVGs at ~40px with a soft drop shadow.
 
 ## Do's and Don'ts
 
-- **Do** use token references (`{colors.tertiary}`) instead of literal hex in
-  component definitions; the palette is single-source.
-- **Don't** introduce colors outside the palette — extend it first.
-- **Don't** nest component variants; `card-hover` is a sibling key, not a child.
-- **Do** keep glass blur modest (`blur(12-14px)`) for the ARM SBC; heavy backdrop
-  filters cost GPU/CPU across many tiles.
+- **Do** use token references (`{colors.accent}`) instead of literal hex in component defs.
+- **Don't** introduce colors outside the palette (black/white/gray + red only).
+- **Don't** add rounding — the identity is sharp/square.
+- **Do** keep glass blur modest (`blur(12px)`) for the ARM SBC.
 - **Don't** reference CDN icons (emoji / mdi- / si- / sh-) — they 404. Local SVGs only.
