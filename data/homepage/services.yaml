@@ -42,7 +42,7 @@
         container: vaultwarden
     - Pi-hole:
         icon: /images/icons/pihole.svg
-        href: https://pihole.home
+        href: https://pihole.home/admin
         description: Ad blocker / DNS
         server: server-home
         container: pihole

@@ -8,9 +8,6 @@
     disk: /
     units: metric
 - openmeteo:
-    label: Bucharest
-    latitude: 44.4268
-    longitude: 26.1025
-    timezone: Europe/Bucharest
+    # No latitude/longitude -> widget uses the browser's current location (HTTPS).
     units: metric
     cache: 5
