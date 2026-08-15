@@ -1,12 +1,12 @@
 - Media:
     - Jellyfin:
-        icon: 🎬
+        icon: /images/icons/jellyfin.svg
         href: https://jellyfin.home
         description: Media server
         server: server-home
         container: jellyfin
     - Transmission:
-        icon: ⬇️
+        icon: /images/icons/transmission.svg
         href: https://transmission.home
         description: Torrent client
         server: server-home
@@ -19,13 +19,13 @@
           rpcUrl: /transmission/
 - Security & Network:
     - Vaultwarden:
-        icon: 🔐
+        icon: /images/icons/vaultwarden.svg
         href: https://vaultwarden.home
         description: Password manager
         server: server-home
         container: vaultwarden
     - Pi-hole:
-        icon: 🛡️
+        icon: /images/icons/pihole.svg
         href: https://pihole.home
         description: Ad blocker / DNS
         server: server-home
@@ -36,20 +36,20 @@
           version: 6
           key: {{HOMEPAGE_VAR_PASSWORD}}
     - WireGuard UI:
-        icon: 🖧
+        icon: /images/icons/wireguard.svg
         href: https://wgui.home
         description: VPN management
         server: server-home
         container: wgui
 - Files & Sync:
     - FileBrowser:
-        icon: 📁
+        icon: /images/icons/filebrowser.svg
         href: https://files.home
         description: File transfer
         server: server-home
         container: filebrowser
     - Syncthing:
-        icon: 🔄
+        icon: /images/icons/syncthing.svg
         href: https://syncthing.home
         description: File sync
         server: server-home
@@ -60,25 +60,25 @@
           key: {{HOMEPAGE_VAR_SYNCTHING_APIKEY}}
 - Admin:
     - Portainer:
-        icon: 🐳
+        icon: /images/icons/portainer.svg
         href: https://portainer.home
         description: Container management
         server: server-home
         container: portainer
     - Duplicati:
-        icon: 💾
+        icon: /images/icons/duplicati.svg
         href: https://duplicati.home
         description: Backups
         server: server-home
         container: duplicati
     - Dozzle:
-        icon: 📜
+        icon: /images/icons/dozzle.svg
         href: https://dozzle.home
         description: Log viewer
         server: server-home
         container: dozzle
     - Hermes:
-        icon: 🤖
+        icon: /images/icons/hermes.svg
         href: https://hermes.home
         description: AI assistant
         server: server-home
