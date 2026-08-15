@@ -25,3 +25,4 @@ external_hdd/
 data/**/*.bak-*
 docker-compose.yaml.bak-*
 .sops-age-key.txt
+data/homepage/logs/
