@@ -1,0 +1,8 @@
+# FileBrowser Quantum — committed config
+# Admin bootstrap user is "admin"; password comes from FILEBROWSER_ADMIN_PASSWORD
+# (set in docker-compose.yaml via ${PASSWORD} interpolation from .env).
+server:
+  sources:
+    - path: "/srv"                 # backend storage mounted from ./external_hdd/data/ftp/storage
+      config:
+        defaultEnabled: true       # grant the source to all users by default

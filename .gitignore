@@ -13,6 +13,9 @@ data/certs/*
 data/certs-generator/*
 !data/certs-generator/templates
 !data/unbound/unbound.conf
+!data/filebrowser
+data/filebrowser/*
+!data/filebrowser/config.yaml
 !data/hermes-proxy
 external_hdd/
 .env
