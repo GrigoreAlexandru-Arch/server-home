@@ -1,9 +1,12 @@
 @theme {
-  --color-primary: #e2e8f0;
-  --color-secondary: #94a3b8;
-  --color-tertiary: #2dd4bf;
-  --color-neutral: #0e1726;
-  --color-on-tertiary: #04231e;
+  --color-primary: #f1f5f9;
+  --color-secondary: #a5b4fc;
+  --color-tertiary: #22d3ee;
+  --color-neutral: #12081f;
+  --color-on-tertiary: #0b0617;
+  --color-accent: #a78bfa;
+  --color-glass: rgba(255, 255, 255, 0.06);
+  --color-glass-border: rgba(255, 255, 255, 0.14);
   --font-body-md: "Inter, system-ui, sans-serif";
   --font-h2: "Inter, system-ui, sans-serif";
   --font-label-caps: "Inter, system-ui, sans-serif";
@@ -11,10 +14,10 @@
   --text-h2: 1.125rem;
   --text-label-caps: 0.75rem;
   --tracking-label-caps: 0.08em;
-  --font-weight-h2: 600;
+  --font-weight-h2: 700;
   --font-weight-label-caps: 600;
-  --radius-md: 14px;
-  --radius-lg: 20px;
+  --radius-md: 20px;
+  --radius-lg: 24px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;

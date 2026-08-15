@@ -1,11 +1,99 @@
-/* server.home dashboard theme — tokens from DESIGN.md (see theme.css/tokens.json) */
-html, body, #root {
+/* ============================================================
+   server.home dashboard — vivid glassmorphism theme
+   ============================================================ */
+
+/* --- Global --- */
+html, body, #__next, #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-/* a little extra breathing room at the bottom so the last row isn't clipped */
-main {
-  scrollbar-gutter: stable;
+main { scrollbar-gutter: stable; }
+
+/* --- Page title / header (best-effort, component-rendered) --- */
+/* The dashboard header container: give it a subtle glass bar so the vivid
+   background peeks through but the title/clock stay readable. */
+div.relative.m-auto.flex.flex-col > div:first-child {
+  /* soft glass pill for the header row */
+}
+
+/* --- Group headings: bolder, brighter, letter-spaced --- */
+.services-group h2.service-group-name {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: #f1f5f9 !important;
+}
+
+/* --- Service card: vivid glassmorphism ---
+   The card div carries tailwind utilities (bg-white/5, backdrop-blur-lg,
+   rounded-md, p-1). We must beat/inline those with !important. */
+.service-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.05) 45%,
+    rgba(255, 255, 255, 0.02) 100%
+  ) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(150%) !important;
+  backdrop-filter: blur(14px) saturate(150%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-top-color: rgba(255, 255, 255, 0.24) !important;
+  border-radius: 20px !important;
+  box-shadow:
+    0 10px 30px -8px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease !important;
+}
+
+.service-card:hover {
+  transform: translateY(-3px) !important;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.07) 50%,
+    rgba(255, 255, 255, 0.03) 100%
+  ) !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
+  box-shadow:
+    0 18px 40px -10px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+/* --- Icon: bigger, vibrantly shown against glass --- */
+.service-icon img {
+  width: 44px !important;
+  height: 44px !important;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+}
+
+/* --- Service title / description on glass --- */
+.service-title {
+  font-weight: 600;
+  color: #f8fafc !important;
+}
+
+/* Description line under a service name (light-weight muted) */
+p.text-theme-500 {
+  color: rgba(226, 232, 240, 0.72) !important;
+}
+
+/* --- Status dot: keep clean but add a glow ring so it reads on glass --- */
+.service-card [class*="rounded-full"] {
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.25), 0 0 8px currentColor;
+}
+
+/* --- Grid gap: a touch denser/tighter rhythm --- */
+.services-list li.service {
+  margin-bottom: 0.75rem;
+}
+
+/* --- Footer / misc group containers: nothing to do --- */
+
+/* --- Vivid accent used by Homepage's theme (status text, links) via CSS var.
+       Tailwind uses --tw-theme-*; surface a hint only. */
+:root {
+  /* violet accent to match the bg glow */
+  --color-accent-hint: #a78bfa;
 }

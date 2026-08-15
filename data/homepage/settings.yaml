@@ -1,13 +1,13 @@
 title: server.home
 theme: dark
-color: teal
+color: violet
 statusStyle: dot
 headerStyle: clean
 fullWidth: true
 useEqualHeights: true
 background:
   image: /images/bg.svg
-cardBlur: md
+cardBlur: lg
 layout:
   Media:
     style: row
