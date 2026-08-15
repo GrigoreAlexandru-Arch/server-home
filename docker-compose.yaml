@@ -298,7 +298,7 @@ services:
     mem_reservation: 256m
     environment:
       - DUPLICATI__WEBSERVICE_PASSWORD=${PASSWORD}
-      - DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES=*
+      - DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES=duplicati.home
       - VIRTUAL_HOST=duplicati.home
       - VIRTUAL_PORT=8200
       - CERT_NAME=home

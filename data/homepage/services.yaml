@@ -71,10 +71,6 @@
         description: Backups
         server: server-home
         container: duplicati
-        widget:
-          type: duplicati
-          url: http://duplicati:8200
-          password: {{HOMEPAGE_VAR_PASSWORD}}
     - Dozzle:
         icon: 📜
         href: https://dozzle.home
