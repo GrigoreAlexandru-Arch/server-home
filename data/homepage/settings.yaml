@@ -1,3 +1,23 @@
 title: server.home
 theme: dark
+color: teal
 statusStyle: dot
+headerStyle: clean
+fullWidth: true
+useEqualHeights: true
+background:
+  image: /images/bg.svg
+cardBlur: md
+layout:
+  Media:
+    style: row
+    columns: 4
+  Security & Network:
+    style: row
+    columns: 4
+  Files & Sync:
+    style: row
+    columns: 4
+  Admin:
+    style: row
+    columns: 4

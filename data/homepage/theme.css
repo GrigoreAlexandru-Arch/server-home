@@ -1,0 +1,22 @@
+@theme {
+  --color-primary: #e2e8f0;
+  --color-secondary: #94a3b8;
+  --color-tertiary: #2dd4bf;
+  --color-neutral: #0e1726;
+  --color-on-tertiary: #04231e;
+  --font-body-md: "Inter, system-ui, sans-serif";
+  --font-h2: "Inter, system-ui, sans-serif";
+  --font-label-caps: "Inter, system-ui, sans-serif";
+  --text-body-md: 1rem;
+  --text-h2: 1.125rem;
+  --text-label-caps: 0.75rem;
+  --tracking-label-caps: 0.08em;
+  --font-weight-h2: 600;
+  --font-weight-label-caps: 600;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 40px;
+}

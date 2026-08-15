@@ -1,0 +1,11 @@
+/* server.home dashboard theme — tokens from DESIGN.md (see theme.css/tokens.json) */
+html, body, #root {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+/* a little extra breathing room at the bottom so the last row isn't clipped */
+main {
+  scrollbar-gutter: stable;
+}

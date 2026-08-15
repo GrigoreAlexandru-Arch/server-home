@@ -384,4 +384,5 @@ services:
       - containet
     volumes:
       - ./data/homepage:/app/config
+      - ./data/homepage/public/images:/app/public/images
       - /var/run/docker.sock:/var/run/docker.sock:ro
