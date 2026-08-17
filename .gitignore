@@ -18,6 +18,10 @@ data/filebrowser/*
 !data/filebrowser/config.yaml
 !data/hermes-proxy
 !data/homepage
+!data/pihole-dyn
+data/pihole-dyn/*
+!data/pihole-dyn/pihole-wrapper.sh
+!data/pihole-dyn/apply-cnames.sh
 external_hdd/
 .env
 

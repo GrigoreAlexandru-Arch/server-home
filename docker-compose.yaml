@@ -91,7 +91,7 @@ services:
     restart: unless-stopped
     networks:
       - containet
-    command: -watch /etc/docker-gen/templates/cname.tmpl /cname_output/cname_output
+    command: -watch -notify-container pihole -notify-signal 10 /etc/docker-gen/templates/cname.tmpl /cname_output/cname_output
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./data/cname/template:/etc/docker-gen/templates
@@ -109,6 +109,7 @@ services:
       - TZ=Europe/Bucharest
       - FTLCONF_dns_upstreams=unbound
       - FTLCONF_webserver_api_password=${PASSWORD}
+      - PIHOLE_API_PASSWORD=${PASSWORD}
       - FTLCONF_webserver_port=80
       - FTLCONF_dns_listeningMode=ALL
       - FTLCONF_dns_hostRecord=server.home,10.8.0.1
