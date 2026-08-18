@@ -1,9 +1,9 @@
-"""pc-gate: minimal authority-gated SSH executor for mihai@pc.home."""
+"""pc-access: minimal authority-gated SSH executor for mihai@pc.home."""
 import os
 import subprocess
 from fastmcp import FastMCP
 
-mcp = FastMCP("pc-gate")
+mcp = FastMCP("pc-access")
 
 PC = os.environ.get("PC_HOST", "mihai@pc.home")
 KEY = os.environ.get("GATE_KEY", "/data/pc-gate/gate_key")
@@ -15,14 +15,14 @@ _SCP_BASE = ["scp", "-o", "BatchMode=yes", "-o", "StrictHostKeyChecking=accept-n
 
 
 @mcp.tool()
-def pc_run_command(command: str) -> str:
+def execute(command: str) -> str:
     """Run `command` on pc.home and return stdout/stderr."""
     p = subprocess.run(_SSH_BASE + [command], capture_output=True, text=True, timeout=120)
     return f"exit={p.returncode}\n{p.stdout}\n{p.stderr}"
 
 
 @mcp.tool()
-def pc_transfer(src: str, dst: str, direction: str) -> str:
+def transfer(src: str, dst: str, direction: str) -> str:
     """Copy a file. direction='push': src is inside the /transfer staging dir, dst is a PC path.
        direction='pull': src is a PC path, dst lands in /transfer."""
     if direction == "push":
