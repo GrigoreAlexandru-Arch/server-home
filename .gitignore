@@ -22,6 +22,13 @@ data/filebrowser/*
 data/pihole-dyn/*
 !data/pihole-dyn/pihole-wrapper.sh
 !data/pihole-dyn/apply-cnames.sh
+!data/pc-gate
+data/pc-gate/*
+!data/pc-gate/requirements.txt
+!data/pc-gate/server.py
+!data/pc-gate/Dockerfile
+!data/pc-gate/init_keys.sh
+!data/pc-gate/entrypoint.sh
 external_hdd/
 .env
 
