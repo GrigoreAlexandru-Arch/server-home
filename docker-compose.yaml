@@ -176,7 +176,7 @@ services:
     container_name: reverse-proxy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-s", "-o", "/dev/null", "http://localhost:80/"]
+      test: ["CMD", "curl", "-fs", "-o", "/dev/null", "-H", "Host: pihole.home", "http://localhost:80/"]
       interval: 30s
       timeout: 5s
       retries: 3
