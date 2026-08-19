@@ -26,6 +26,7 @@ data/pihole-dyn/*
 data/pc-gate/*
 !data/pc-gate/requirements.txt
 !data/pc-gate/server.py
+!data/pc-gate/test_offline.py
 !data/pc-gate/Dockerfile
 !data/pc-gate/init_keys.sh
 !data/pc-gate/entrypoint.sh
