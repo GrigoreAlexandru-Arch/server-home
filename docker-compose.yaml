@@ -193,6 +193,26 @@ services:
       - ./data/certs:/etc/nginx/certs
       - ./data/reverse-proxy:/etc/nginx/vhost.d
 
+  cert-reloader:
+    build: ./data/cert-reloader
+    image: cert-reloader:1.0.0
+    container_name: cert-reloader
+    restart: unless-stopped
+    mem_limit: 64m
+    mem_reservation: 32m
+    healthcheck:
+      test: ["CMD-SHELL", "[ \"$(cat /proc/1/comm)\" = \"node\" ] && [ -S /var/run/docker.sock ]"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    networks:
+      - containet
+    volumes:
+      # RW on purpose: this container issues `docker exec` into reverse-proxy
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/certs:/certs
+
   filebrowser:
     image: gtstef/filebrowser:1.5.2-stable-slim
     container_name: filebrowser

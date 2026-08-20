@@ -38,3 +38,6 @@ data/**/*.bak-*
 docker-compose.yaml.bak-*
 .sops-age-key.txt
 data/homepage/logs/
+!data/cert-reloader
+!data/cert-reloader/Dockerfile
+!data/cert-reloader/cert-reload.mjs
