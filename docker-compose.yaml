@@ -454,5 +454,7 @@ services:
     ports:
       - "127.0.0.1:8123:8123"
     volumes:
-      - ./data/pc-gate/keys:/data/pc-gate
+      - pc-gate-keys:/data/pc-gate
       - ./data/pc-gate/staging:/transfer
+volumes:
+  pc-gate-keys:
