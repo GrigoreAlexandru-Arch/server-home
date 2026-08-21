@@ -433,3 +433,27 @@ services:
       - ./data/homepage:/app/config
       - ./data/homepage/public/images:/app/public/images
       - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  pc-pull:
+    image: ghcr.io/GrigoreAlexandru-Arch/pc-pull:1.0.0
+    container_name: pc-pull
+    restart: unless-stopped
+    user: "1000:1000"
+    mem_limit: 128m
+    mem_reservation: 64m
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz', timeout=5)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    environment:
+      - VIRTUAL_HOST=pull.home
+      - VIRTUAL_PORT=8000
+      - CERT_NAME=home
+      - PULL_TOKEN=${PC_PULL_TOKEN}
+      - STAGING_DIR=/data
+    networks:
+      - containet
+    volumes:
+      - ./data/pull-staging:/data
