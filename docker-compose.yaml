@@ -457,3 +457,27 @@ services:
       - containet
     volumes:
       - ./data/pull-staging:/data
+
+  pc-push:
+    image: ghcr.io/grigorealexandru-arch/pc-push:1.0.0
+    container_name: pc-push
+    restart: unless-stopped
+    user: "1000:1000"
+    mem_limit: 128m
+    mem_reservation: 64m
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz', timeout=5)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    environment:
+      - VIRTUAL_HOST=push.home
+      - VIRTUAL_PORT=8000
+      - CERT_NAME=home
+      - PUSH_TOKEN=${PC_PUSH_TOKEN}
+      - STAGING_DIR=/data
+    networks:
+      - containet
+    volumes:
+      - ./data/push-staging:/data
