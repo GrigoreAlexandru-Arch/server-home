@@ -33,3 +33,18 @@ data/homepage/logs/
 !data/cert-reloader
 !data/cert-reloader/Dockerfile
 !data/cert-reloader/cert-reload.mjs
+
+# honcho — deployment settings only (self-hosted memory layer for Hermes)
+!data/honcho
+data/honcho/*
+!data/honcho/config.toml
+!data/honcho/docker-compose.yml
+!data/honcho/Dockerfile
+!data/honcho/.dockerignore
+!data/honcho/README.md
+!data/honcho/docker
+data/honcho/docker/*
+!data/honcho/docker/entrypoint.sh
+!data/honcho/database
+data/honcho/database/*
+!data/honcho/database/init.sql
