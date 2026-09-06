@@ -38,7 +38,6 @@ data/homepage/logs/
 !data/honcho
 data/honcho/*
 !data/honcho/config.toml
-!data/honcho/docker-compose.yml
 !data/honcho/Dockerfile
 !data/honcho/.dockerignore
 !data/honcho/README.md

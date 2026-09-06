@@ -16,7 +16,11 @@ services:
     mem_reservation: 1g
     cpus: 4
     healthcheck:
-      test: ["CMD-SHELL", "curl --noproxy 'localhost' -Lk -fsS \"$${HEALTHCHECK_URL}\" || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          'curl --noproxy ''localhost'' -Lk -fsS "$${HEALTHCHECK_URL}" || exit 1',
+        ]
       interval: 30s
       timeout: 30s
       start_period: 10s
@@ -82,7 +86,7 @@ services:
     container_name: cnames-generator
     mem_limit: 64m
     healthcheck:
-      test: ["CMD-SHELL", "[ \"$(cat /proc/1/comm)\" = \"docker-gen\" ]"]
+      test: ["CMD-SHELL", '[ "$(cat /proc/1/comm)" = "docker-gen" ]']
       interval: 30s
       timeout: 5s
       retries: 3
@@ -104,7 +108,11 @@ services:
     mem_limit: 256m
     mem_reservation: 128m
     healthcheck:
-      test: ["CMD-SHELL", "dig -p $(pihole-FTL --config dns.port) +short +norecurse +retry=0 @127.0.0.1 pi.hole || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "dig -p $(pihole-FTL --config dns.port) +short +norecurse +retry=0 @127.0.0.1 pi.hole || exit 1",
+        ]
     environment:
       - TZ=Europe/Bucharest
       - FTLCONF_dns_upstreams=unbound
@@ -156,7 +164,7 @@ services:
     restart: unless-stopped
     mem_limit: 64m
     healthcheck:
-      test: ["CMD-SHELL", "[ \"$(cat /proc/1/comm)\" = \"docker-gen\" ]"]
+      test: ["CMD-SHELL", '[ "$(cat /proc/1/comm)" = "docker-gen" ]']
       interval: 30s
       timeout: 5s
       retries: 3
@@ -176,7 +184,17 @@ services:
     container_name: reverse-proxy
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-fs", "-o", "/dev/null", "-H", "Host: pihole.home", "http://localhost:80/"]
+      test:
+        [
+          "CMD",
+          "curl",
+          "-fs",
+          "-o",
+          "/dev/null",
+          "-H",
+          "Host: pihole.home",
+          "http://localhost:80/",
+        ]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -201,7 +219,11 @@ services:
     mem_limit: 64m
     mem_reservation: 32m
     healthcheck:
-      test: ["CMD-SHELL", "[ \"$(cat /proc/1/comm)\" = \"node\" ] && [ -S /var/run/docker.sock ]"]
+      test:
+        [
+          "CMD-SHELL",
+          '[ "$(cat /proc/1/comm)" = "node" ] && [ -S /var/run/docker.sock ]',
+        ]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -284,7 +306,11 @@ services:
     container_name: transmission
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "curl -s -o /dev/null http://localhost:9091/transmission/rpc"]
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -o /dev/null http://localhost:9091/transmission/rpc",
+        ]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -378,7 +404,11 @@ services:
     mem_limit: 256m
     mem_reservation: 128m
     healthcheck:
-      test: ["CMD-SHELL", "curl -fkLsS -m 2 127.0.0.1:8384/rest/noauth/health | grep -o --color=never OK || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fkLsS -m 2 127.0.0.1:8384/rest/noauth/health | grep -o --color=never OK || exit 1",
+        ]
       interval: 60s
       timeout: 10s
       retries: 3
@@ -408,7 +438,11 @@ services:
     container_name: homepage
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:3000/api/healthcheck || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q -O /dev/null http://localhost:3000/api/healthcheck || exit 1",
+        ]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -442,7 +476,13 @@ services:
     mem_limit: 128m
     mem_reservation: 64m
     healthcheck:
-      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz', timeout=5)"]
+      test:
+        [
+          "CMD",
+          "python3",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz', timeout=5)",
+        ]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -466,7 +506,13 @@ services:
     mem_limit: 128m
     mem_reservation: 64m
     healthcheck:
-      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz', timeout=5)"]
+      test:
+        [
+          "CMD",
+          "python3",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz', timeout=5)",
+        ]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -481,3 +527,115 @@ services:
       - containet
     volumes:
       - ./data/push-staging:/data
+
+  honcho-api:
+    container_name: honcho-api
+    restart: unless-stopped
+    mem_limit: 1024m
+    mem_reservation: 512m
+    image: honcho-api:latest
+    build:
+      context: ../honcho
+      dockerfile: ../docker-config/data/honcho/Dockerfile
+    entrypoint: ["sh", "docker/entrypoint.sh"]
+    depends_on:
+      honcho-db:
+        condition: service_healthy
+      honcho-redis:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      - DB_CONNECTION_URI=postgresql+psycopg://honcho:honcho@honcho-db:5432/honcho
+      - CACHE_URL=redis://honcho-redis:6379/0?suppress=true
+      - CACHE_ENABLED=true
+      - METRICS_ENABLED=false
+      - LLM_VLLM_API_KEY=${LLM_VLLM_API_KEY}
+      - LLM_VLLM_BASE_URL=${LLM_VLLM_BASE_URL:-https://openrouter.ai/api/v1}
+      - LLM_EMBEDDING_API_KEY=${LLM_EMBEDDING_API_KEY}
+      - LLM_EMBEDDING_BASE_URL=${LLM_EMBEDDING_BASE_URL:-https://openrouter.ai/api/v1}
+      - LLM_EMBEDDING_MODEL=${LLM_EMBEDDING_MODEL:-openai/text-embedding-3-small}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python3 -c \"import urllib.request;urllib.request.urlopen('http://localhost:8000/health',timeout=5)\"",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - containet
+    volumes:
+      - ./data/honcho/docker/entrypoint.sh:/app/docker/entrypoint.sh:ro
+      - ./data/honcho/config.toml:/app/config.toml:ro
+
+  honcho-deriver:
+    container_name: honcho-deriver
+    restart: unless-stopped
+    mem_limit: 512m
+    mem_reservation: 256m
+    image: honcho-deriver:latest
+    build:
+      context: ../honcho
+      dockerfile: ../docker-config/data/honcho/Dockerfile
+    entrypoint: ["/app/.venv/bin/python", "-m", "src.deriver"]
+    depends_on:
+      honcho-db:
+        condition: service_healthy
+      honcho-redis:
+        condition: service_healthy
+    environment:
+      - DB_CONNECTION_URI=postgresql+psycopg://honcho:honcho@honcho-db:5432/honcho
+      - CACHE_URL=redis://honcho-redis:6379/0?suppress=true
+      - CACHE_ENABLED=true
+      - METRICS_ENABLED=false
+      - LLM_VLLM_API_KEY=${LLM_VLLM_API_KEY}
+      - LLM_VLLM_BASE_URL=${LLM_VLLM_BASE_URL:-https://openrouter.ai/api/v1}
+      - LLM_EMBEDDING_API_KEY=${LLM_EMBEDDING_API_KEY}
+      - LLM_EMBEDDING_BASE_URL=${LLM_EMBEDDING_BASE_URL:-https://openrouter.ai/api/v1}
+      - LLM_EMBEDDING_MODEL=${LLM_EMBEDDING_MODEL:-openai/text-embedding-3-small}
+    networks:
+      - containet
+    volumes:
+      - ./data/honcho/config.toml:/app/config.toml:ro
+
+  honcho-db:
+    container_name: honcho-db
+    restart: unless-stopped
+    mem_limit: 512m
+    mem_reservation: 256m
+    image: pgvector/pgvector:pg15
+    command: ["postgres", "-c", "max_connections=200"]
+    environment:
+      - POSTGRES_DB=honcho
+      - POSTGRES_USER=honcho
+      - POSTGRES_PASSWORD=honcho
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U honcho -d honcho"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - containet
+    volumes:
+      - ./data/honcho/database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./data/honcho/pgdata:/var/lib/postgresql/data/
+
+  honcho-redis:
+    container_name: honcho-redis
+    restart: unless-stopped
+    mem_limit: 128m
+    mem_reservation: 64m
+    image: redis:8.2
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - containet
+    volumes:
+      - ./data/honcho/redis-data:/data

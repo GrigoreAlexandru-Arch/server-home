@@ -66,8 +66,10 @@ COPY --chown=app:app alembic.ini /app/alembic.ini
 # src/_version.py reads the service version from here at runtime, so this
 # is a runtime input as well as a build input.
 COPY --chown=app:app pyproject.toml /app/pyproject.toml
-# Copy config files - this will copy config.toml if it exists, and config.toml.example
-COPY --chown=app:app config.toml* /app/
+# Copy config files - config.toml is mounted at runtime (see docker-compose.yaml),
+# so it is NOT baked into the image here (a symlinked out-of-context config.toml
+# would also break the BuildKit context).
+# COPY --chown=app:app config.toml* /app/
 
 # Switch to non-root user
 USER app
