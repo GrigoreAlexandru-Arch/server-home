@@ -550,11 +550,8 @@ services:
       - CACHE_URL=redis://honcho-redis:6379/0?suppress=true
       - CACHE_ENABLED=true
       - METRICS_ENABLED=false
-      - LLM_VLLM_API_KEY=${LLM_VLLM_API_KEY}
-      - LLM_VLLM_BASE_URL=${LLM_VLLM_BASE_URL:-https://openrouter.ai/api/v1}
-      - LLM_EMBEDDING_API_KEY=${LLM_EMBEDDING_API_KEY}
-      - LLM_EMBEDDING_BASE_URL=${LLM_EMBEDDING_BASE_URL:-https://openrouter.ai/api/v1}
-      - LLM_EMBEDDING_MODEL=${LLM_EMBEDDING_MODEL:-openai/text-embedding-3-small}
+      - LLM_OPENAI_API_KEY=${LLM_VLLM_API_KEY}
+      - LLM_OPENAI_BASE_URL=${LLM_VLLM_BASE_URL:-https://openrouter.ai/api/v1}
     healthcheck:
       test:
         [
@@ -591,11 +588,8 @@ services:
       - CACHE_URL=redis://honcho-redis:6379/0?suppress=true
       - CACHE_ENABLED=true
       - METRICS_ENABLED=false
-      - LLM_VLLM_API_KEY=${LLM_VLLM_API_KEY}
-      - LLM_VLLM_BASE_URL=${LLM_VLLM_BASE_URL:-https://openrouter.ai/api/v1}
-      - LLM_EMBEDDING_API_KEY=${LLM_EMBEDDING_API_KEY}
-      - LLM_EMBEDDING_BASE_URL=${LLM_EMBEDDING_BASE_URL:-https://openrouter.ai/api/v1}
-      - LLM_EMBEDDING_MODEL=${LLM_EMBEDDING_MODEL:-openai/text-embedding-3-small}
+      - LLM_OPENAI_API_KEY=${LLM_VLLM_API_KEY}
+      - LLM_OPENAI_BASE_URL=${LLM_VLLM_BASE_URL:-https://openrouter.ai/api/v1}
     networks:
       - containet
     volumes:
