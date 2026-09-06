@@ -633,3 +633,31 @@ services:
       - containet
     volumes:
       - ./data/honcho/redis-data:/data
+
+  epub-to-audiobook:
+    image: ghcr.io/p0n1/epub_to_audiobook:v0.8.7
+    container_name: epub-to-audiobook
+    restart: unless-stopped
+    command: ["--host", "0.0.0.0", "--port", "7860"]
+    mem_limit: 1g
+    mem_reservation: 512m
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "python3 -c \"import urllib.request;urllib.request.urlopen('http://127.0.0.1:7860/',timeout=5)\"",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    environment:
+      - VIRTUAL_HOST=audiobook.home
+      - VIRTUAL_PORT=7860
+      - CERT_NAME=home
+      - OPENAI_BASE_URL=http://10.8.0.9:8004/v1
+      - OPENAI_API_KEY=dummy
+    networks:
+      - containet
+    volumes:
+      - ./data/epub-to-audiobook:/app
