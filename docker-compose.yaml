@@ -661,3 +661,39 @@ services:
       - containet
     volumes:
       - ./data/epub-to-audiobook:/app
+      - ./data/epub-to-audiobook/openai_tts_provider.py:/app_src/audiobook_generator/tts_providers/openai_tts_provider.py:ro
+
+  unwritten-hours:
+    image: unwritten-hours:1.0.0
+    container_name: unwritten-hours
+    build:
+      context: ../unwritten-hours
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    user: "1000:1000"
+    stop_grace_period: 15s
+    mem_limit: 256m
+    mem_reservation: 128m
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:8787/api/state').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    environment:
+      - ALLOWED_HOSTS=unwritten.home,127.0.0.1
+      - VIRTUAL_HOST=unwritten.home
+      - VIRTUAL_PORT=8787
+      - CERT_NAME=home
+    networks:
+      - containet
+    ports:
+      - 127.0.0.1:8787:8787
+    volumes:
+      - ../unwritten-hours/world:/app/world
