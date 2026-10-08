@@ -376,7 +376,7 @@ services:
       - ./data:/data
 
   dozzle:
-    image: amir20/dozzle:v10.7.1
+    image: amir20/dozzle:v11.3.0
     container_name: dozzle
     restart: unless-stopped
     healthcheck:
