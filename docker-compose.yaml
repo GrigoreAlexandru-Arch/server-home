@@ -387,14 +387,20 @@ services:
       start_period: 20s
     mem_limit: 64m
     mem_reservation: 32m
+    user: "1000:1000"
+    group_add:
+      - "990" # docker group — needed to read /var/run/docker.sock as non-root
     networks:
       - containet
     environment:
       - VIRTUAL_HOST=dozzle.home
       - VIRTUAL_PORT=8080
       - CERT_NAME=home
+      - DOZZLE_AUTH_PROVIDER=simple # login required — logs are not public
+      - DOZZLE_NO_ANALYTICS=true # local-first: no release/usage callbacks
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./data/dozzle:/data # users.yml + settings persist across recreates
 
   syncthing:
     image: syncthing/syncthing:2.1.3
