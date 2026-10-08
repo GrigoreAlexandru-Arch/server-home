@@ -355,7 +355,19 @@ services:
     image: duplicati/duplicati:2.3.0.4
     container_name: duplicati
     restart: unless-stopped
-    user: "1000:1000"
+    # Runs as root so it can read root-owned container state (wgui writes its
+    # client configs 0600 root, redis/postgres state is 0600/0700 uid 999).
+    # Capabilities cannot be granted to a non-root container user: runc puts
+    # them in the bounding set only, effective set stays empty.
+    # Hardened: drop everything, add back only what reading needs.
+    user: "0:0"
+    cap_drop:
+      - ALL
+    cap_add:
+      - DAC_OVERRIDE
+      - CHOWN
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8200'"]
       interval: 30s
@@ -367,6 +379,9 @@ services:
     environment:
       - DUPLICATI__WEBSERVICE_PASSWORD=${PASSWORD}
       - DUPLICATI__WEBSERVICE_ALLOWED_HOSTNAMES=duplicati.home
+      # Duplicati's own state lives outside /data: it must not back up its own
+      # live sqlite db, and root-owned files stay out of the config tree.
+      - XDG_CONFIG_HOME=/config
       - VIRTUAL_HOST=duplicati.home
       - VIRTUAL_PORT=8200
       - CERT_NAME=home
@@ -374,6 +389,8 @@ services:
       - containet
     volumes:
       - ./data:/data
+      - /home/arch/duplicati:/config
+      - ./:/repo:ro
 
   dozzle:
     image: amir20/dozzle:v11.3.0
