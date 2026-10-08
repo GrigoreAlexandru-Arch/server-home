@@ -31,7 +31,7 @@ function mtime() {
 
 async function reload() {
   const now = Date.now();
-  if (now - lastReload < MIN_GAP_MS) return;
+  if (now - lastReload < MIN_GAP_MS) return false; // suppressed -> caller must NOT baseline
   try {
     const container = docker.getContainer(TARGET);
     const exec = await container.exec({ Cmd: ["nginx", "-s", "reload"] });
@@ -48,8 +48,10 @@ async function reload() {
     }
     lastReload = Date.now();
     console.log(`[reload] ${TARGET} <- cert mtime ${lastMtime} (exec ${exec.id.slice(0, 8)})`);
+    return true;
   } catch (err) {
     console.error(`[reload] FAILED for ${TARGET}:`, err.message);
+    return false;
   }
 }
 
@@ -81,8 +83,12 @@ while (true) {
     continue; // let the normal change-detection path re-establish the new mtime baseline
   }
   if (changed) {
-    lastMtime = current;
     await new Promise((r) => setTimeout(r, SETTLE_MS));
-    await reload();
+    // Baseline ONLY a rewrite we actually propagated. Advancing lastMtime before
+    // the debounced reload meant a second rewrite landing inside the MIN_GAP_MS
+    // window was recorded as "seen" while its reload was dropped — so nginx kept
+    // serving the earlier cert (missing a newly added VIRTUAL_HOST) until the next
+    // unrelated event. If suppressed, leave lastMtime alone: the next poll retries.
+    if (await reload()) lastMtime = current;
   }
 }
