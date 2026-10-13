@@ -401,13 +401,14 @@ services:
     mem_reservation: 192m
     command:
       - "-storageDataPath=/victoria-metrics-data"
-      - "-retentionPeriod=90d"
+      - "-retentionPeriod=7d"
+      - "-opentelemetry.usePrometheusNaming"
     networks:
       - containet
     ports:
       - "127.0.0.1:8428:8428"
     volumes:
-      - ./data/victoria-metrics:/victoria-metrics-data
+      - ./external_hdd/data/victoria-metrics:/victoria-metrics-data
 
   victoria-logs:
     image: victoriametrics/victoria-logs:v1.53.0
@@ -418,13 +419,13 @@ services:
     mem_reservation: 128m
     command:
       - "-storageDataPath=/victoria-logs-data"
-      - "-retentionPeriod=90d"
+      - "-retentionPeriod=7d"
     networks:
       - containet
     ports:
       - "127.0.0.1:9428:9428"
     volumes:
-      - ./data/victoria-logs:/victoria-logs-data
+      - ./external_hdd/data/victoria-logs:/victoria-logs-data
 
   victoria-traces:
     image: victoriametrics/victoria-traces:v0.12.0
@@ -435,13 +436,13 @@ services:
     mem_reservation: 128m
     command:
       - "-storageDataPath=/victoria-traces-data"
-      - "-retentionPeriod=90d"
+      - "-retentionPeriod=7d"
     networks:
       - containet
     ports:
       - "127.0.0.1:10428:10428"
     volumes:
-      - ./data/victoria-traces:/victoria-traces-data
+      - ./external_hdd/data/victoria-traces:/victoria-traces-data
 
   grafana:
     image: grafana/grafana:13.2.4
