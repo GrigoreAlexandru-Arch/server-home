@@ -70,12 +70,12 @@
         description: Backups
         server: server-home
         container: duplicati
-    - Dozzle:
-        icon: /images/icons/dozzle.svg
-        href: https://dozzle.home
-        description: Log viewer
+    - Grafana:
+        icon: si:grafana
+        href: https://grafana.home
+        description: Logs · Traces · Metrics
         server: server-home
-        container: dozzle
+        container: grafana
     - Hermes:
         icon: /images/icons/hermes.svg
         href: https://hermes.home

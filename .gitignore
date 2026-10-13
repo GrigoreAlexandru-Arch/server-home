@@ -47,3 +47,13 @@ data/honcho/docker/*
 !data/honcho/database
 data/honcho/database/*
 !data/honcho/database/init.sql
+
+# Alloy — only the committed config; runtime storage stays ignored.
+!data/alloy
+data/alloy/data
+!data/alloy/config.alloy
+
+# Grafana — only provisioning; the runtime data dir (db, plugins) stays ignored.
+!data/grafana
+data/grafana/data
+!data/grafana/provisioning

@@ -1,0 +1,90 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Grafana Alloy — the single collector for server.home observability.
+//   • Agent telemetry (Hermes) arrives over OTLP and fans out to the 3 stores.
+//   • Infrastructure: host metrics, per-container metrics, container logs.
+// No tail sampling — everything is stored, filtered at query time.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Agent telemetry (OTLP from hermes_otel) → Victoria stores ────────────────
+otelcol.receiver.otlp "hermes" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+  output {
+    traces  = [otelcol.exporter.otlphttp.victoria_traces.input]
+    metrics = [otelcol.exporter.otlphttp.victoria_metrics.input]
+    logs    = [otelcol.exporter.otlphttp.victoria_logs.input]
+  }
+}
+
+otelcol.exporter.otlphttp "victoria_traces" {
+  client {
+    endpoint = "http://victoria-traces:10428/insert/opentelemetry"
+  }
+}
+
+otelcol.exporter.otlphttp "victoria_metrics" {
+  client {
+    endpoint = "http://victoria-metrics:8428/opentelemetry"
+  }
+}
+
+otelcol.exporter.otlphttp "victoria_logs" {
+  client {
+    endpoint = "http://victoria-logs:9428/insert/opentelemetry"
+  }
+}
+
+// ── Host metrics (embedded node_exporter) → VictoriaMetrics ──────────────────
+// Host /proc, /sys and / are bind-mounted read-only into the container.
+prometheus.exporter.unix "host" {
+  procfs_path = "/host/proc"
+  sysfs_path  = "/host/sys"
+  rootfs_path = "/rootfs"
+  // thermal_zone is off by default; needed for SoC temperature on the RK3588.
+  enable_collectors = ["thermal_zone"]
+}
+
+prometheus.scrape "host" {
+  targets         = prometheus.exporter.unix.host.targets
+  forward_to      = [prometheus.remote_write.vm.receiver]
+  scrape_interval = "30s"
+}
+
+// ── Per-container metrics (cAdvisor) → VictoriaMetrics ───────────────────────
+// Replaces Dozzle's per-container CPU/mem graphs.
+prometheus.exporter.cadvisor "containers" {}
+
+prometheus.scrape "containers" {
+  targets         = prometheus.exporter.cadvisor.containers.targets
+  forward_to      = [prometheus.remote_write.vm.receiver]
+  scrape_interval = "30s"
+}
+
+prometheus.remote_write "vm" {
+  endpoint {
+    url = "http://victoria-metrics:8428/api/v1/write"
+  }
+}
+
+// ── Container logs (Docker socket) → VictoriaLogs ────────────────────────────
+// Replaces Dozzle entirely.
+discovery.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+loki.source.docker "containers" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.docker.containers.targets
+  forward_to = [loki.write.vl.receiver]
+  labels     = {}
+}
+
+loki.write "vl" {
+  endpoint {
+    url = "http://victoria-logs:9428/insert/loki/api/v1/push"
+  }
+}

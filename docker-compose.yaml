@@ -392,32 +392,125 @@ services:
       - /home/arch/duplicati:/config
       - ./:/repo:ro
 
-  dozzle:
-    image: amir20/dozzle:v11.3.0
-    container_name: dozzle
+  victoria-metrics:
+    image: victoriametrics/victoria-metrics:v1.154.0
+    container_name: victoria-metrics
     restart: unless-stopped
+    user: "1000:1000"
+    mem_limit: 256m
+    mem_reservation: 128m
+    command:
+      - "-storageDataPath=/victoria-metrics-data"
+      - "-retentionPeriod=90d"
+    networks:
+      - containet
+    ports:
+      - "127.0.0.1:8428:8428"
+    volumes:
+      - ./data/victoria-metrics:/victoria-metrics-data
+
+  victoria-logs:
+    image: victoriametrics/victoria-logs:v1.53.0
+    container_name: victoria-logs
+    restart: unless-stopped
+    user: "1000:1000"
+    mem_limit: 256m
+    mem_reservation: 128m
+    command:
+      - "-storageDataPath=/victoria-logs-data"
+      - "-retentionPeriod=90d"
+    networks:
+      - containet
+    ports:
+      - "127.0.0.1:9428:9428"
+    volumes:
+      - ./data/victoria-logs:/victoria-logs-data
+
+  victoria-traces:
+    image: victoriametrics/victoria-traces:v0.12.0
+    container_name: victoria-traces
+    restart: unless-stopped
+    user: "1000:1000"
+    mem_limit: 256m
+    mem_reservation: 128m
+    command:
+      - "-storageDataPath=/victoria-traces-data"
+      - "-retentionPeriod=90d"
+    networks:
+      - containet
+    ports:
+      - "127.0.0.1:10428:10428"
+    volumes:
+      - ./data/victoria-traces:/victoria-traces-data
+
+  grafana:
+    image: grafana/grafana:13.2.4
+    container_name: grafana
+    restart: unless-stopped
+    mem_limit: 384m
+    mem_reservation: 192m
     healthcheck:
-      test: ["CMD", "/dozzle", "healthcheck"]
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q -O /dev/null http://localhost:3000/api/health || exit 1",
+        ]
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 20s
-    mem_limit: 64m
-    mem_reservation: 32m
-    user: "1000:1000"
-    group_add:
-      - "990" # docker group — needed to read /var/run/docker.sock as non-root
+      start_period: 30s
+    environment:
+      - GF_SECURITY_ADMIN_USER=${USER_ACCOUNT}
+      - GF_SECURITY_ADMIN_PASSWORD=${PASSWORD}
+      - GF_SERVER_ROOT_URL=https://grafana.home
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_ANALYTICS_REPORTING_ENABLED=false
+      - GF_ANALYTICS_CHECK_FOR_UPDATES=false
+      - GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES=false
+      - GF_INSTALL_PLUGINS=victoriametrics-logs-datasource
+      - VIRTUAL_HOST=grafana.home
+      - VIRTUAL_PORT=3000
+      - CERT_NAME=home
     networks:
       - containet
-    environment:
-      - VIRTUAL_HOST=dozzle.home
-      - VIRTUAL_PORT=8080
-      - CERT_NAME=home
-      - DOZZLE_AUTH_PROVIDER=simple # login required — logs are not public
-      - DOZZLE_NO_ANALYTICS=true # local-first: no release/usage callbacks
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./data/dozzle:/data # users.yml + settings persist across recreates
+      - ./data/grafana/data:/var/lib/grafana
+      - ./data/grafana/provisioning:/etc/grafana/provisioning:ro
+
+  alloy:
+    image: grafana/alloy:v1.20.1
+    container_name: alloy
+    restart: unless-stopped
+    privileged: true
+    mem_limit: 384m
+    mem_reservation: 192m
+    command:
+      - "run"
+      - "--server.http.listen-addr=0.0.0.0:12345"
+      - "--storage.path=/var/lib/alloy/data"
+      - "/etc/alloy/config.alloy"
+    networks:
+      - containet
+    ports:
+      - "127.0.0.1:12345:12345" # Alloy UI
+      - "127.0.0.1:4317:4317" # OTLP gRPC from Hermes
+      - "127.0.0.1:4318:4318" # OTLP HTTP from Hermes
+    volumes:
+      - ./data/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - ./data/alloy:/var/lib/alloy
+      # Docker socket (cw/ro) for log collection + cAdvisor.
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Host rootfs, run, cgroups and docker data — required by node_exporter + cAdvisor.
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /sys:/host/sys:ro
+      - /proc:/host/proc:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      # Docker's real data-root lives on the HDD (custom path) — cAdvisor needs it
+      # at its absolute path for per-container filesystem/inode stats.
+      - /home/arch/docker-config/external_hdd/docker-data:/home/arch/docker-config/external_hdd/docker-data:ro
+      - /dev/disk:/dev/disk:ro
 
   syncthing:
     image: syncthing/syncthing:2.1.3
