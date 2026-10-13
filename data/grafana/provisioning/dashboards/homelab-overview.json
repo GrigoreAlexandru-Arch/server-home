@@ -4,7 +4,7 @@
   "tags": ["homelab", "server-home"],
   "timezone": "browser",
   "schemaVersion": 39,
-  "version": 2,
+  "version": 3,
   "refresh": "30s",
   "time": { "from": "now-6h", "to": "now" },
   "annotations": { "list": [] },
@@ -204,7 +204,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "100 - (node_filesystem_avail_bytes{fstype!~\"tmpfs|overlay|squashfs|ramfs\"} / node_filesystem_size_bytes{fstype!~\"tmpfs|overlay|squashfs|ramfs\"} * 100)",
+          "expr": "100 - (node_filesystem_avail_bytes{device!~\"/dev/zram.*\",mountpoint!~\"/var/log.*\",fstype!~\"tmpfs|overlay|squashfs|ramfs\"} / node_filesystem_size_bytes{device!~\"/dev/zram.*\",mountpoint!~\"/var/log.*\",fstype!~\"tmpfs|overlay|squashfs|ramfs\"} * 100)",
           "legendFormat": "{{mountpoint}}"
         }
       ],
@@ -314,13 +314,13 @@
       "id": 11,
       "type": "stat",
       "title": "Tokens used (24h)",
-      "description": "LLM tokens in+out over the last 24h (hermes_otel → Alloy → VictoriaMetrics)",
+      "description": "LLM tokens in+out over the last 24h (gen_ai_client_token_usage_sum, live family, via Alloy → VictoriaMetrics)",
       "datasource": { "type": "prometheus", "uid": "victoriametrics" },
       "gridPos": { "h": 5, "w": 12, "x": 0, "y": 31 },
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(increase({__name__=~\"gen_ai[._]client[._]token[._]usage_sum\"}[24h]))",
+          "expr": "sum(increase(gen_ai_client_token_usage_sum[24h]))",
           "legendFormat": "tokens"
         }
       ],
@@ -339,13 +339,13 @@
       "id": 12,
       "type": "stat",
       "title": "Tool calls (24h)",
-      "description": "Tool invocations over the last 24h",
+      "description": "Tool invocations over the last 24h (gen_ai_execute_tool_duration_seconds_count)",
       "datasource": { "type": "prometheus", "uid": "victoriametrics" },
       "gridPos": { "h": 5, "w": 12, "x": 12, "y": 31 },
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(increase({__name__=~\"gen_ai[._]execute_tool[._]duration_count\"}[24h]))",
+          "expr": "sum(increase(gen_ai_execute_tool_duration_seconds_count[24h]))",
           "legendFormat": "calls"
         }
       ],
@@ -363,15 +363,15 @@
     {
       "id": 13,
       "type": "timeseries",
-      "title": "Agent token rate (1h)",
-      "description": "Smoothed over 1h — agent traffic is bursty, so a short window reads empty between sessions",
+      "title": "Agent tokens (last 1h)",
+      "description": "Tokens consumed in the last hour. increase(), not rate(): these are per-process cumulative counters, so rate() divides by the sample gap and reads absurdly high.",
       "datasource": { "type": "prometheus", "uid": "victoriametrics" },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 36 },
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate({__name__=~\"gen_ai[._]client[._]token[._]usage_sum\"}[1h]))",
-          "legendFormat": "tokens/s"
+          "expr": "sum(increase(gen_ai_client_token_usage_sum[1h]))",
+          "legendFormat": "tokens"
         }
       ],
       "fieldConfig": {
@@ -389,14 +389,14 @@
     {
       "id": 14,
       "type": "timeseries",
-      "title": "Agent tool-call rate (1h)",
+      "title": "Agent tool calls (last 1h)",
       "datasource": { "type": "prometheus", "uid": "victoriametrics" },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 36 },
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate({__name__=~\"gen_ai[._]execute_tool[._]duration_count\"}[1h]))",
-          "legendFormat": "tool calls/s"
+          "expr": "sum(increase(gen_ai_execute_tool_duration_seconds_count[1h]))",
+          "legendFormat": "calls"
         }
       ],
       "fieldConfig": {
