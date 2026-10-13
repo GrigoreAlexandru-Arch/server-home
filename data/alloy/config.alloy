@@ -76,11 +76,59 @@ discovery.docker "containers" {
   host = "unix:///var/run/docker.sock"
 }
 
+// Expose the container name as a real label. loki.source.docker's own `labels`
+// map only takes static values, so this goes through a relabel rule over the
+// Docker target meta labels. The rule strips the leading slash Docker puts on
+// the name. Result: container_name="grafana" etc. on every entry.
+discovery.relabel "containers" {
+  targets = discovery.docker.containers.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/?(.*)"
+    target_label  = "container_name"
+  }
+}
+
 loki.source.docker "containers" {
-  host       = "unix:///var/run/docker.sock"
-  targets    = discovery.docker.containers.targets
+  host          = "unix:///var/run/docker.sock"
+  targets       = discovery.docker.containers.targets
+  relabel_rules = discovery.relabel.containers.rules
+  forward_to    = [loki.process.containers.receiver]
+}
+
+// Parse container log lines at ingest. Parsed values are attached as structured
+// metadata, which VictoriaLogs stores as ordinary log fields, so they are
+// directly queryable (e.g. level:error, container_name:pihole).
+// Malformed lines are never dropped: stage.json defaults to drop_malformed=false
+// and both parsers are guarded by a line filter.
+loki.process "containers" {
   forward_to = [loki.write.vl.receiver]
-  labels     = {}
+
+  // Strip ANSI colour codes first — nginx-proxy lines carry them.
+  stage.decolorize {}
+
+  // logfmt emitters, e.g. Grafana / Alloy: logger=... level=info msg="..."
+  stage.match {
+    selector = "{container_name=~\".+\"} |~ \"^[A-Za-z_][A-Za-z0-9_.-]*=\""
+    stage.logfmt {
+      regex = ".*"
+    }
+    stage.structured_metadata {
+      regex = ".*"
+    }
+  }
+
+  // JSON emitters: every top-level key becomes a field.
+  stage.match {
+    selector = "{container_name=~\".+\"} |~ \"^{\""
+    stage.json {
+      regex = ".*"
+    }
+    stage.structured_metadata {
+      regex = ".*"
+    }
+  }
 }
 
 loki.write "vl" {
