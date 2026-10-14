@@ -879,7 +879,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (name) (rate(container_cpu_usage_seconds_total{name!=\"\"}[5m]))",
+          "expr": "sort_desc(sum by (name) (rate(container_cpu_usage_seconds_total{name!=\"\"}[5m])))",
           "legendFormat": "{{name}}"
         }
       ],
@@ -927,7 +927,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "container_memory_working_set_bytes{name!=\"\"}",
+          "expr": "sort_desc(sum by (name) (container_memory_working_set_bytes{name!=\"\"}))",
           "legendFormat": "{{name}}"
         }
       ],
@@ -971,7 +971,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "100 * container_memory_working_set_bytes{name!=\"\"} / container_spec_memory_limit_bytes{name!=\"\"}",
+          "expr": "sort_desc(100 * sum by (name) (container_memory_working_set_bytes{name!=\"\"}) / sum by (name) (container_spec_memory_limit_bytes{name!=\"\"}))",
           "legendFormat": "{{name}}"
         }
       ],
@@ -1033,7 +1033,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (name) (rate(container_blkio_device_usage_total{name!=\"\"}[5m]))",
+          "expr": "sort_desc(sum by (name) (rate(container_blkio_device_usage_total{name!=\"\"}[5m])))",
           "legendFormat": "{{name}}"
         }
       ],
@@ -1077,7 +1077,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum by (name) (rate(container_network_receive_bytes_total{name!=\"\"}[5m]) + rate(container_network_transmit_bytes_total{name!=\"\"}[5m]))",
+          "expr": "sort_desc(sum by (name) (rate(container_network_receive_bytes_total{name!=\"\"}[5m]) + rate(container_network_transmit_bytes_total{name!=\"\"}[5m])))",
           "legendFormat": "{{name}}"
         }
       ],
@@ -1134,7 +1134,7 @@
         {
           "refId": "A",
           "expr": "container_name:* | stats by (_time:5m, container_name) count()",
-          "legendFormat": ""
+          "queryType": "statsRange"
         }
       ],
       "fieldConfig": {
@@ -1179,7 +1179,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "container_name:*"
+          "expr": "container_name:*",
+          "queryType": "instant"
         }
       ],
       "options": {
@@ -1187,7 +1188,8 @@
         "wrapLogMessage": true,
         "sortOrder": "Descending",
         "enableLogDetails": true,
-        "prettifyLogMessage": false
+        "prettifyLogMessage": false,
+        "showLevel": false
       },
       "description": "Live tail of every container's logs (VictoriaLogs, container_name label)."
     },
@@ -1208,7 +1210,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "service.name:hermes-agent"
+          "expr": "service.name:hermes-agent",
+          "queryType": "instant"
         }
       ],
       "options": {
@@ -1216,7 +1219,8 @@
         "wrapLogMessage": true,
         "sortOrder": "Descending",
         "enableLogDetails": true,
-        "prettifyLogMessage": false
+        "prettifyLogMessage": false,
+        "showLevel": false
       },
       "description": "Hermes agent's own logs shipped to VictoriaLogs."
     }
