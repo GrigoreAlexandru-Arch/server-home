@@ -38,6 +38,10 @@ src = sqlite3.connect(f"file:{src_path}?mode=ro", uri=True)
 dst = sqlite3.connect(dst_path)
 with dst:
     src.backup(dst)                      # online backup API: consistent, no lock held long
+# The source is WAL-mode, so the copy inherits WAL. Switch it to rollback-journal
+# mode so the snapshot is ONE self-contained file — no -wal/-shm sidecars to ship
+# (an empty -wal still appears just from opening it, which invites a torn restore).
+dst.execute("PRAGMA journal_mode=DELETE").fetchone()
 res = dst.execute("PRAGMA integrity_check").fetchone()[0]
 if res != "ok":
     sys.stderr.write(f"integrity_check failed: {res}\n")
