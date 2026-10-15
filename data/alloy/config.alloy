@@ -56,7 +56,21 @@ prometheus.scrape "host" {
 
 // ── Per-container metrics (cAdvisor) → VictoriaMetrics ───────────────────────
 // Replaces Dozzle's per-container CPU/mem graphs.
-prometheus.exporter.cadvisor "containers" {}
+//
+// `disk` (container_fs_* filesystem-usage) is DISABLED: cAdvisor computes it by
+// walking each container's whole layer tree under the HDD data-root, which cost
+// ~300MiB of dentry/inode slab cache + CPU on every housekeeping tick — the
+// dominant consumer of Alloy's memory budget. Host filesystem metrics come from
+// prometheus.exporter.unix (node_filesystem_*); blkio `diskIO` counters are kept.
+// `disabled_metrics` OVERRIDES cAdvisor's defaults, so the default set is listed too.
+prometheus.exporter.cadvisor "containers" {
+  docker_only               = true
+  disable_root_cgroup_stats = true
+  disabled_metrics = [
+    "advtcp", "cpu_topology", "cpuset", "hugetlb", "memory_numa", "process",
+    "referenced_memory", "resctrl", "sched", "tcp", "udp", "disk",
+  ]
+}
 
 prometheus.scrape "containers" {
   targets         = prometheus.exporter.cadvisor.containers.targets
