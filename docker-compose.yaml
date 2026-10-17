@@ -323,7 +323,6 @@ services:
       - TZ=Europe/Bucharest
       - USER=${USER_ACCOUNT}
       - PASS=${PASSWORD}
-      - DOCKER_MODS=linuxserver/mods:transmission-floodui
       - VIRTUAL_HOST=transmission.home
       - VIRTUAL_PORT=9091
       - CERT_NAME=home
