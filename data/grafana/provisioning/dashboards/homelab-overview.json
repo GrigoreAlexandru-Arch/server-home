@@ -108,7 +108,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+          "expr": "max((1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100)",
           "legendFormat": ""
         }
       ],
@@ -226,7 +226,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "node_load1",
+          "expr": "max(node_load1)",
           "legendFormat": ""
         }
       ],
@@ -268,7 +268,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "(1 - (node_memory_SwapFree_bytes / node_memory_SwapTotal_bytes)) * 100",
+          "expr": "max((1 - (node_memory_SwapFree_bytes / node_memory_SwapTotal_bytes)) * 100)",
           "legendFormat": ""
         }
       ],
@@ -327,7 +327,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "node_time_seconds - node_boot_time_seconds",
+          "expr": "max(node_time_seconds - node_boot_time_seconds)",
           "legendFormat": ""
         }
       ],
@@ -415,12 +415,12 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "node_memory_MemTotal_bytes",
+          "expr": "max(node_memory_MemTotal_bytes)",
           "legendFormat": "total"
         },
         {
           "refId": "B",
-          "expr": "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes",
+          "expr": "max(node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes)",
           "legendFormat": "used"
         }
       ],
@@ -465,7 +465,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "100 - (node_filesystem_avail_bytes{device!~\"/dev/zram.*\",mountpoint!~\"/var/log.*|/run.*\",fstype!~\"tmpfs|overlay|squashfs|ramfs|fuse.*|fuseblk|devtmpfs\"} / node_filesystem_size_bytes{device!~\"/dev/zram.*\",mountpoint!~\"/var/log.*|/run.*\",fstype!~\"tmpfs|overlay|squashfs|ramfs|fuse.*|fuseblk|devtmpfs\"} * 100)",
+          "expr": "max without (instance, job) (100 - (node_filesystem_avail_bytes{device!~\"/dev/zram.*\",mountpoint!~\"/var/log.*|/run.*\",fstype!~\"tmpfs|overlay|squashfs|ramfs|fuse.*|fuseblk|devtmpfs\"} / node_filesystem_size_bytes{device!~\"/dev/zram.*\",mountpoint!~\"/var/log.*|/run.*\",fstype!~\"tmpfs|overlay|squashfs|ramfs|fuse.*|fuseblk|devtmpfs\"} * 100))",
           "legendFormat": "{{mountpoint}}"
         }
       ],
@@ -515,17 +515,17 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "node_load1",
+          "expr": "max(node_load1)",
           "legendFormat": "1m"
         },
         {
           "refId": "B",
-          "expr": "node_load5",
+          "expr": "max(node_load5)",
           "legendFormat": "5m"
         },
         {
           "refId": "C",
-          "expr": "node_load15",
+          "expr": "max(node_load15)",
           "legendFormat": "15m"
         }
       ],
@@ -672,7 +672,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "100 - (node_filesystem_avail_bytes{device!~\"/dev/zram.*\",mountpoint!~\"/var/log.*|/run.*\",fstype!~\"tmpfs|overlay|squashfs|ramfs|fuse.*|fuseblk|devtmpfs\"} / node_filesystem_size_bytes{device!~\"/dev/zram.*\",mountpoint!~\"/var/log.*|/run.*\",fstype!~\"tmpfs|overlay|squashfs|ramfs|fuse.*|fuseblk|devtmpfs\"} * 100)",
+          "expr": "max without (instance, job) (100 - (node_filesystem_avail_bytes{device!~\"/dev/zram.*\",mountpoint!~\"/var/log.*|/run.*\",fstype!~\"tmpfs|overlay|squashfs|ramfs|fuse.*|fuseblk|devtmpfs\"} / node_filesystem_size_bytes{device!~\"/dev/zram.*\",mountpoint!~\"/var/log.*|/run.*\",fstype!~\"tmpfs|overlay|squashfs|ramfs|fuse.*|fuseblk|devtmpfs\"} * 100))",
           "format": "table",
           "instant": true
         }
@@ -971,7 +971,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sort_desc(100 * sum by (name) (container_memory_working_set_bytes{name!=\"\"}) / sum by (name) (container_spec_memory_limit_bytes{name!=\"\"}))",
+          "expr": "sort_desc(100 * sum by (name) (container_memory_working_set_bytes{name!=\"\"}) / sum by (name) (container_spec_memory_limit_bytes{name!=\"\"} > 0))",
           "legendFormat": "{{name}}"
         }
       ],
@@ -1014,7 +1014,7 @@
         "minVizHeight": 16,
         "minVizWidth": 8
       },
-      "description": "Working set as a percentage of each container's configured mem_limit."
+      "description": "Working set as a percentage of each container's configured mem_limit. Containers with no memory limit are excluded (a 0-byte limit would divide to Infinity)."
     },
     {
       "id": 26,
