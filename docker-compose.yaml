@@ -335,6 +335,38 @@ services:
       - ./data/transmission:/config
       - ./external_hdd/data/ftp/storage/public/downloads:/downloads
 
+  flood:
+    image: jesec/flood:4.16.2
+    container_name: flood
+    restart: unless-stopped
+    user: "1000:1000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.status < 500 ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    mem_limit: 512m
+    mem_reservation: 256m
+    environment:
+      - FLOOD_OPTION_host=0.0.0.0
+      - FLOOD_OPTION_rundir=/data
+      - FLOOD_OPTION_allowedpath=/downloads
+      - VIRTUAL_HOST=flood.home
+      - VIRTUAL_PORT=3000
+      - CERT_NAME=home
+    networks:
+      - containet
+    volumes:
+      - ./data/flood:/data
+      - ./external_hdd/data/ftp/storage/public/downloads:/downloads
+
   portainer:
     image: portainer/portainer-ce:2.44.0
     container_name: portainer
