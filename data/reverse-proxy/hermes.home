@@ -1,0 +1,9 @@
+# Voice uploads (ASR) take longer than nginx-proxy's 60s default read timeout,
+# and WAV recordings exceed nginx's 1M default body limit. The inner hermes-proxy
+# hop is set to 100m/300s to match — keep both aligned.
+#
+# NOTE: this file overrides vhost.d/default for hermes.home, so the body limit
+# that lived there must be repeated here or uploads 413 at this hop.
+client_max_body_size 100M;
+proxy_read_timeout 300s;
+proxy_send_timeout 300s;

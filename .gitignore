@@ -17,6 +17,10 @@ data/certs-generator/*
 data/filebrowser/*
 !data/filebrowser/config.yaml
 !data/hermes-proxy
+!data/reverse-proxy
+data/reverse-proxy/*
+!data/reverse-proxy/default
+!data/reverse-proxy/hermes.home
 !data/homepage
 !data/pihole-dyn
 data/pihole-dyn/*
