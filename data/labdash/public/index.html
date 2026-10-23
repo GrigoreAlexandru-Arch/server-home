@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>server.home</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07080a; --rail:#0b0c0d; --surface:#101111; --surface-2:#161718; --surface-3:#1b1c1e;
+    --text:#f9f9f9; --text-2:#cecece; --text-3:#9c9c9d; --text-4:#6a6b6c;
+    --red:#ff6363; --blue:#55b3ff; --green:#5fc992; --yellow:#ffbc33;
+    --border:hsl(195,5%,15%); --border-hi:rgba(255,255,255,.1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg); color:var(--text-2); height:100vh; overflow:hidden;
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    font-feature-settings:"calt","kern","liga","ss03";
+    letter-spacing:.2px; -webkit-font-smoothing:antialiased;
+    display:flex;
+  }
+  /* rail */
+  .rail{
+    width:64px; flex:0 0 64px; background:var(--rail); height:100vh;
+    border-right:1px solid var(--border);
+    display:flex; flex-direction:column; align-items:center; gap:6px; padding:14px 0;
+  }
+  .rail .brand{font-size:11px; font-weight:700; color:var(--text); letter-spacing:-.4px; margin-bottom:10px; line-height:1}
+  .rail .brand em{color:var(--red); font-style:normal}
+  .rail-btn{
+    width:40px;height:40px;border-radius:9px; display:grid; place-items:center;
+    cursor:pointer; color:var(--text-4); background:transparent; border:0;
+    transition:background .13s,color .13s; position:relative;
+  }
+  .rail-btn:hover{background:rgba(255,255,255,.05); color:var(--text-2)}
+  .rail-btn.active{background:var(--surface-3); color:#fff; box-shadow:rgba(255,255,255,.07) 0 0 0 1px}
+  .rail-btn.active::before{content:''; position:absolute; left:-14px; top:11px; bottom:11px; width:2px;
+    background:var(--red); border-radius:0 2px 2px 0}
+  .rail-btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.7}
+  .rail-btn .badge{position:absolute; top:5px; right:4px; width:5px;height:5px;border-radius:50%;
+    background:var(--yellow); box-shadow:0 0 6px rgba(255,188,51,.6)}
+  .rail .foot{
+    margin-top:auto; display:flex; flex-direction:column; align-items:center; gap:3px;
+    font-family:'Geist Mono',monospace; font-size:9px; color:var(--text-4); line-height:1.4;
+  }
+  .rail .foot b{color:var(--text-3); font-weight:500}
+  .rail .foot .tick{width:5px;height:5px;border-radius:50%;background:var(--green);
+    box-shadow:0 0 6px rgba(95,201,146,.6); margin-bottom:4px}
+  .rail .foot .tick.stale{background:var(--yellow); box-shadow:0 0 6px rgba(255,188,51,.6)}
+
+  main{flex:1; min-width:0; height:100vh; overflow-y:auto; padding:20px 24px 32px}
+  .top{display:flex; align-items:center; gap:12px; margin-bottom:16px}
+  h1{font-size:22px; font-weight:600; color:var(--text); letter-spacing:-.3px}
+  h1 span{color:var(--text-4); font-weight:400; font-size:13px; margin-left:8px; letter-spacing:.2px}
+  .spacer{flex:1}
+  .hostline{display:flex; gap:14px; font-family:'Geist Mono',monospace; font-size:10.5px; color:var(--text-4); letter-spacing:.3px}
+  .hostline b{color:var(--text-3); font-weight:500}
+  .btn{
+    font-family:inherit; font-size:12px; font-weight:500; padding:5px 11px; border-radius:6px;
+    cursor:pointer; background:transparent; color:var(--text-3); text-decoration:none;
+    border:1px solid var(--border-hi); box-shadow:rgba(0,0,0,.03) 0 7px 3px; transition:opacity .15s,color .15s;
+  }
+  .btn:hover{opacity:.72;color:#fff}
+  .btn.solid{background:hsla(0,0%,100%,.815);color:#18191a;border:0;border-radius:86px}
+  .btn.solid:hover{background:#fff;opacity:1}
+
+  .bar{
+    display:flex;align-items:center;gap:10px;background:var(--surface);
+    border-radius:10px;padding:9px 13px;margin-bottom:16px;
+    box-shadow:rgb(27,28,30) 0 0 0 1px,rgb(7,8,10) 0 0 0 1px inset,rgba(0,0,0,.35) 0 12px 28px -10px;
+  }
+  .bar svg{width:15px;height:15px;stroke:var(--text-4);fill:none;stroke-width:1.9;flex:0 0 15px}
+  .bar input{flex:1;background:transparent;border:0;outline:0;font-family:inherit;font-size:13.5px;font-weight:500;color:var(--text)}
+  .bar input::placeholder{color:var(--text-4)}
+  kbd{font-family:'Geist Mono',monospace;font-size:10px;color:var(--text-3);padding:2px 5px;border-radius:4px;
+      background:linear-gradient(#121212,#0d0d0d);
+      box-shadow:rgba(0,0,0,.4) 0 1.5px .5px 2.5px,rgba(255,255,255,.05) 0 1px 0 0 inset,rgba(255,255,255,.08) 0 0 0 1px}
+
+  .cols{display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start}
+  .glabel{
+    font-size:10.5px; font-weight:600; letter-spacing:.9px; text-transform:uppercase;
+    color:var(--text-4); margin:14px 0 7px; display:flex; align-items:center; gap:7px;
+  }
+  .col > .glabel:first-child{margin-top:0}
+  .glabel .n{font-family:'Geist Mono',monospace; font-size:10px; opacity:.7}
+  .glabel .rule{flex:1;height:1px;background:var(--border)}
+
+  .row{
+    display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:8px;
+    cursor:pointer;background:var(--surface);margin-bottom:5px;text-decoration:none;color:inherit;
+    box-shadow:rgb(27,28,30) 0 0 0 1px, rgb(7,8,10) 0 0 0 1px inset;
+    transition:background .12s;
+  }
+  .row:hover{background:var(--surface-2)}
+  .ico{width:24px;height:24px;flex:0 0 24px;border-radius:6px;background:var(--surface-3);
+       display:grid;place-items:center;box-shadow:rgba(255,255,255,.06) 0 0 0 1px}
+  .ico img{width:14px;height:14px;object-fit:contain;opacity:.95}
+  .ico .letter{font-size:11px;font-weight:600;color:var(--text-2)}
+  .info{min-width:0;flex:1}
+  .name{display:block;font-size:13px;font-weight:500;color:var(--text-2);letter-spacing:.1px}
+  .row:hover .name{color:#fff}
+  .desc{display:block;font-size:10.5px;color:var(--text-4);margin-top:1px;
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .meta{font-family:'Geist Mono',monospace;font-size:10.5px;color:var(--text-4);flex:0 0 auto}
+  .spark{width:44px;height:16px;flex:0 0 44px;opacity:.85}
+  .spark polyline{fill:none;stroke:var(--blue);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round;opacity:.75}
+  .spark polygon{fill:var(--blue);opacity:.1}
+  .spark.warn polyline{stroke:var(--yellow);opacity:.8}
+  .spark.warn polygon{fill:var(--yellow)}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 7px rgba(95,201,146,.5);flex:0 0 6px}
+  .dot.warn{background:var(--yellow);box-shadow:0 0 7px rgba(255,188,51,.5)}
+  .dot.down{background:var(--red);box-shadow:0 0 7px rgba(255,99,99,.5)}
+  .dot.idle{background:var(--text-4);box-shadow:none}
+
+  .empty{font-size:12.5px;color:var(--text-4);padding:10px 2px}
+  @media (max-width:900px){ .cols{grid-template-columns:1fr} .rail{display:none} .hostline{display:none} }
+</style>
+</head>
+<body>
+
+<nav class="rail">
+  <div class="brand">s<em>.</em>h</div>
+  <button class="rail-btn active" data-group="*" title="All">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+  </button>
+  <button class="rail-btn" data-group="Media &amp; files" title="Media">
+    <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="M10 9l5 3-5 3z"/></svg>
+  </button>
+  <button class="rail-btn" data-group="Security &amp; network" title="Security">
+    <svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/></svg>
+  </button>
+  <button class="rail-btn" data-group="Admin &amp; tools" title="Admin">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 00-.1-1l2-1.5-2-3.4-2.3 1a7 7 0 00-1.7-1L14.5 3h-4l-.4 2.5a7 7 0 00-1.7 1l-2.3-1-2 3.4L6 11a7 7 0 000 2l-2 1.5 2 3.4 2.3-1a7 7 0 001.7 1l.4 2.5h4l.4-2.5a7 7 0 001.7-1l2.3 1 2-3.4-2-1.5c.1-.3.1-.7.1-1z"/></svg>
+    <span class="badge" id="railBadge" hidden></span>
+  </button>
+  <div class="foot" id="railFoot">
+    <span class="tick" id="tick"></span>
+    <span id="railUp">—</span>
+  </div>
+</nav>
+
+<main>
+  <div class="top">
+    <h1>Services<span id="subline">connecting…</span></h1>
+    <span class="spacer"></span>
+    <span class="hostline" id="hostline"></span>
+    <a class="btn" href="https://grafana.home" target="_blank" rel="noreferrer">Grafana</a>
+    <a class="btn solid" href="https://portainer.home" target="_blank" rel="noreferrer">Portainer</a>
+  </div>
+
+  <div class="bar">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></svg>
+    <input id="q" placeholder="Filter services…" autocomplete="off">
+    <kbd>⌘K</kbd>
+  </div>
+
+  <div class="cols" id="cols"></div>
+</main>
+
+<script>
+let STATE = null;
+let filter = '';
+let group = '*';
+
+const $ = (s) => document.querySelector(s);
+
+function spark(series, warn){
+  const pts = (series && series.length) ? series.slice(-24) : [0];
+  const max = Math.max(...pts, 1e-9);
+  const w = 44, h = 16, step = w / Math.max(pts.length - 1, 1);
+  const xy = pts.map((v, i) => [ +(i*step).toFixed(1), +(h - 2 - (v/max)*(h-4)).toFixed(1) ]);
+  const line = xy.map(p => p.join(',')).join(' ');
+  const area = '0,' + h + ' ' + line + ' ' + w + ',' + h;
+  return `<svg class="spark ${warn?'warn':''}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+    <polygon points="${area}"/><polyline points="${line}"/></svg>`;
+}
+
+function rowHTML(s){
+  const ico = s.icon
+    ? `<img src="/icons/${s.icon}" alt="">`
+    : `<span class="letter">${s.letter || s.name[0]}</span>`;
+  const metric = (s.metrics && s.metrics[0] && s.metrics[0].value) || '—';
+  return `<a class="row" href="${s.url}" target="_blank" rel="noreferrer" title="${(s.note||'').replace(/"/g,'&quot;')}">
+    <span class="ico">${ico}</span>
+    <span class="info"><span class="name">${s.name}</span><span class="desc">${s.note || s.desc}</span></span>
+    <span class="meta">${metric}</span>
+    ${spark(s.series, s.state === 'warn' || s.state === 'down')}
+    <span class="dot ${s.state}"></span>
+  </a>`;
+}
+
+function render(){
+  if (!STATE) return;
+  const q = filter.trim().toLowerCase();
+  let items = STATE.services.filter(s => {
+    if (group !== '*' && s.group !== group) return false;
+    if (!q) return true;
+    return s.name.toLowerCase().includes(q) || s.desc.includes(q) || s.group.toLowerCase().includes(q);
+  });
+
+  if (!items.length){
+    $('#cols').innerHTML = '<p class="empty">Nothing matches that filter.</p>';
+    return;
+  }
+
+  const groups = [...new Set(items.map(s => s.group))];
+  const half = Math.ceil(groups.length / 2);
+  const renderCol = (gs) => gs.map(g => {
+    const list = items.filter(s => s.group === g);
+    return `<div class="glabel">${g}<span class="n">${list.length}</span><span class="rule"></span></div>` + list.map(rowHTML).join('');
+  }).join('');
+
+  $('#cols').innerHTML =
+    `<div class="col">${renderCol(groups.slice(0, half))}</div>` +
+    `<div class="col">${renderCol(groups.slice(half))}</div>`;
+}
+
+function renderChrome(){
+  if (!STATE) return;
+  const { summary, host, updated } = STATE;
+  const warn = summary.warn + summary.down;
+  $('#subline').textContent = `${summary.total} services · ${summary.up} healthy` + (warn ? ` · ${warn} needs a look` : '');
+  $('#railUp').innerHTML = `<b>${summary.up}</b>/${summary.total}<br>up`;
+  $('#railBadge').hidden = warn === 0;
+  const age = Math.round((Date.now() - new Date(updated).getTime()) / 1000);
+  $('#tick').className = 'tick' + (age > 45 ? ' stale' : '');
+  if (host){
+    $('#hostline').innerHTML =
+      `<span>up <b>${host.uptime}</b></span>` +
+      `<span>load <b>${host.load1}</b></span>` +
+      `<span>mem <b>${host.memUsedGb}</b>/${host.memTotalGb}g</span>` +
+      `<span>hdd <b>${host.hddUsedPct.toFixed(0)}%</b></span>` +
+      (host.tempC ? `<span><b>${host.tempC}</b>°c</span>` : '');
+  }
+}
+
+async function refresh(){
+  try {
+    const r = await fetch('/api/state', { cache: 'no-store' });
+    STATE = await r.json();
+    renderChrome();
+    render();
+  } catch (e) {
+    $('#subline').textContent = 'dashboard api unreachable';
+  }
+}
+
+$('#q').addEventListener('input', (e) => { filter = e.target.value; render(); });
+document.querySelectorAll('.rail-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.rail-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    group = btn.dataset.group;
+    render();
+  });
+});
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k'){ e.preventDefault(); $('#q').focus(); $('#q').select(); }
+  if (e.key === 'Escape'){ $('#q').blur(); }
+});
+
+refresh();
+setInterval(refresh, 10000);
+</script>
+</body>
+</html>

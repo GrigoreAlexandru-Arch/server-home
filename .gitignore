@@ -22,6 +22,11 @@ data/reverse-proxy/*
 !data/reverse-proxy/default
 !data/reverse-proxy/hermes.home
 !data/homepage
+
+# labdash — source is tracked; build output and deps are not.
+!data/labdash
+data/labdash/node_modules
+data/labdash/dist
 !data/pihole-dyn
 data/pihole-dyn/*
 !data/pihole-dyn/pihole-wrapper.sh
